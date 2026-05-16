@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Search, MapPin, Globe, Mail, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -10,16 +11,16 @@ interface Club {
   website: string;
   contact_email: string;
   logo_url: string;
+  logo?: string;
+  club_badge?: string;
 }
 
-export default function ClubsDirectoryPage() {
+export default function ClubDirectoryPage() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchClubs() {
-     useEffect(() => {
     async function fetchClubs() {
       const { data, error } = await supabase
         .from('clubs')
@@ -32,17 +33,18 @@ export default function ClubsDirectoryPage() {
       setLoading(false);
     }
     fetchClubs();
-  }, []); // <-- Fixed typo here (removed the extra duplicate array)
+  }, []);
+
   const filteredClubs = clubs.filter(club => 
-    club.name.toLowerCase().includes(search.toLowerCase()) ||
-    club.location.toLowerCase().includes(search.toLowerCase())
+    club.name?.toLowerCase().includes(search.toLowerCase()) ||
+    club.location?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="py-12 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
-        {/* Header Header */}
+        {/* Header Section */}
         <div className="mb-10 text-center max-w-2xl mx-auto">
           <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-2">Rugby Fan Network</p>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight sm:text-4xl">Registered Rugby Clubs</h1>
@@ -70,44 +72,53 @@ export default function ClubsDirectoryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredClubs.map((club) => (
-              <div key={club.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-4 mb-4">
-                    {club.logo_url ? (
-                      <img src={club.logo_url} alt={`${club.name} badge`} className="w-14 h-14 object-contain rounded bg-slate-50 p-1 shrink-0 border border-slate-100" />
-                    ) : (
-                      <div className="w-14 h-14 bg-slate-100 rounded flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
-                        <Shield size={24} />
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-lg leading-tight">{club.name}</h3>
-                      <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                        <MapPin size={12} className="text-slate-400" />
-                        {club.location}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-600 line-clamp-3 mb-6">{club.description || 'No description provided yet.'}</p>
-                </div>
+            {filteredClubs.map((club) => {
+              // Extract the available logo asset string across schema variations
+              const displayLogo = club.logo_url || club.logo || club.club_badge;
 
-                <div className="flex items-center gap-2 pt-4 border-t border-slate-100 mt-auto">
-                  {club.website && (
-                    <a href={club.website.startsWith('http') ? club.website : `https://${club.website}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs text-slate-600 hover:bg-[#002366] hover:text-white hover:border-[#002366] transition-all">
-                      <Globe size={12} />
-                      Website
-                    </a>
-                  )}
-                  {club.contact_email && (
-                    <a href={`mailto:${club.contact_email}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs text-slate-600 hover:bg-[#002366] hover:text-white hover:border-[#002366] transition-all">
-                      <Mail size={12} />
-                      Contact
-                    </a>
-                  )}
+              return (
+                <div key={club.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-4 mb-4">
+                      {displayLogo ? (
+                        <img 
+                          src={displayLogo} 
+                          alt={`${club.name} badge`} 
+                          className="w-14 h-14 object-contain rounded bg-slate-50 p-1 shrink-0 border border-slate-100" 
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-slate-100 rounded flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
+                          <Shield size={24} />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-lg leading-tight">{club.name}</h3>
+                        <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                          <MapPin size={12} className="text-slate-400" />
+                          {club.location}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-slate-600 line-clamp-3 mb-6">{club.description || 'No description provided yet.'}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-4 border-t border-slate-100 mt-auto">
+                    {club.website && (
+                      <a href={club.website.startsWith('http') ? club.website : `https://${club.website}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs text-slate-600 hover:bg-[#002366] hover:text-white hover:border-[#002366] transition-all">
+                        <Globe size={12} />
+                        Website
+                      </a>
+                    )}
+                    {club.contact_email && (
+                      <a href={`mailto:${club.contact_email}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs text-slate-600 hover:bg-[#002366] hover:text-white hover:border-[#002366] transition-all">
+                        <Mail size={12} />
+                        Contact
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
