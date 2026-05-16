@@ -1,4 +1,4 @@
-import { useState, useRef, type FormEvent, type DragEvent } from 'react';
+-import { useState, useRef, type FormEvent, type DragEvent } from 'react';
 import { ArrowLeft, Upload, CheckCircle, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -6,8 +6,14 @@ import { businessCategories, sanitizeUrl } from '../lib/categories';
 
 export default function BusinessRegistrationPage() {
   const [form, setForm] = useState({
-    name: '', category: businessCategories[0], customCategory: '',
-    description: '', website: '', contactName: '', contactEmail: '',
+    name: '',
+    category: businessCategories[0],
+    customCategory: '',
+    description: '',
+    website: '',
+    contactName: '',
+    contactEmail: '',
+    phone: '',
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -45,28 +51,42 @@ export default function BusinessRegistrationPage() {
     if (logoFile) {
       const ext = logoFile.name.split('.').pop() || 'png';
       const path = `business-logos/${Date.now()}.${ext}`;
+      
+      // Uploading to your public 'logos' storage bucket
       const { error: uploadError } = await supabase.storage
         .from('logos')
         .upload(path, logoFile, { upsert: true });
+        
       if (!uploadError) {
         const { data } = supabase.storage.from('logos').getPublicUrl(path);
         logoUrl = data.publicUrl;
+      } else {
+        console.error('Storage Upload Error:', uploadError);
       }
     }
 
     const category = form.category === 'Other / Custom Segment' ? form.customCategory : form.category;
     const website = sanitizeUrl(form.website);
 
+    // Map fields explicitly to align perfectly with your updated database schema
     const { error } = await supabase.from('businesses').insert({
       name: form.name,
       category: category || form.category,
       description: form.description,
       website: website || null,
-      logo: logoUrl,
+      logo_url: logoUrl,                  // Fixed column mapping from 'logo' to 'logo_url'
+      contact_name: form.contactName,     // Saved user's input safely
+      contact_email: form.contactEmail,   // Saved user's input safely
+      phone: form.phone,                  // Saved public contact number
       membership_tier: 'premium',
     });
 
-    if (error) { setStatus('error'); return; }
+    if (error) { 
+      console.error('Database Insertion Error:', error);
+      setStatus('error'); 
+      return; 
+    }
+    
     setStatus('success');
   }
 
@@ -109,10 +129,11 @@ export default function BusinessRegistrationPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* Form */}
+          {/* Form Content Area */}
           <div className="lg:col-span-3">
             <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-8 lg:p-10 space-y-6">
-              {/* Logo Upload */}
+              
+              {/* Logo Upload Zone */}
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">Company Logo</label>
                 <div
@@ -146,11 +167,13 @@ export default function BusinessRegistrationPage() {
                 </div>
               </div>
 
+              {/* Business Name */}
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">Business Name *</label>
                 <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. Rugby Solutions Ltd" />
               </div>
 
+              {/* Industry Selection */}
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">Industry Sector *</label>
                 <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all cursor-pointer">
@@ -158,6 +181,7 @@ export default function BusinessRegistrationPage() {
                 </select>
               </div>
 
+              {/* Custom Industry Input Block */}
               {form.category === 'Other / Custom Segment' && (
                 <div>
                   <label className="block text-sm font-bold text-slate-900 mb-2">Custom Industry Segment *</label>
@@ -165,17 +189,26 @@ export default function BusinessRegistrationPage() {
                 </div>
               )}
 
+              {/* Description textarea */}
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">Description</label>
                 <textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all resize-none" placeholder="Tell clubs what you do and how you can help..." />
               </div>
 
+              {/* Website URL Input */}
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">Website</label>
                 <input type="text" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="mycompany.com" />
                 <p className="text-[10px] text-slate-400 mt-1">https:// will be added automatically if omitted</p>
               </div>
 
+              {/* Public Phone Vector */}
+              <div>
+                <label className="block text-sm font-bold text-slate-900 mb-2">Public Contact Phone Number</label>
+                <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. 01234 567890" />
+              </div>
+
+              {/* Account Profile Admin Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-bold text-slate-900 mb-2">Contact Name *</label>
@@ -197,7 +230,7 @@ export default function BusinessRegistrationPage() {
             </form>
           </div>
 
-          {/* Order Summary */}
+          {/* Order Summary Sidebar Panel */}
           <div className="lg:col-span-2">
             <div className="bg-white border border-slate-200 rounded-lg p-8 sticky top-28">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#002366] mb-6">Order Summary</p>
@@ -225,7 +258,7 @@ export default function BusinessRegistrationPage() {
                 ))}
               </ul>
 
-              {/* Stripe Placeholder */}
+              {/* Stripe Dynamic Portal Box */}
               <div className="border border-slate-200 rounded-lg p-6 bg-slate-50">
                 <div className="flex items-center gap-3 mb-4">
                   <CreditCard size={18} className="text-slate-400" />
@@ -233,7 +266,6 @@ export default function BusinessRegistrationPage() {
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-4">
                   <code className="text-xs text-slate-400 font-mono block">
-                    {/* STRIPE_CHECKOUT_SESSION_PLACEHOLDER */}
                     Payment integration will appear here.
                   </code>
                 </div>
