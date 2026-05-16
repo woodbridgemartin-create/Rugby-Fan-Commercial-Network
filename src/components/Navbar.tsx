@@ -1,11 +1,11 @@
+
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { to: '/', label: 'Home' },
-  { to: '/clubs', label: 'Clubs' },
-  { to: '/directory', label: 'Directory' },
+  { to: '/clubs', label: 'Clubs' }, // This now powers your entire live search directory layout
   { to: '/business-network', label: 'Business Network' },
   { to: '/faq', label: 'FAQ' },
 ];
@@ -27,6 +27,7 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -49,6 +50,7 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setOpen(!open)}
             className="lg:hidden p-2 text-slate-400 hover:text-[#002366]"
@@ -58,6 +60,7 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Dropdown Menu Navigation */}
       {open && (
         <div className="lg:hidden border-t border-slate-200 bg-white">
           <div className="px-6 py-4 space-y-3">
