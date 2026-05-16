@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Target, Shield, Handshake, Award, ArrowRight, Search, MapPin, Globe, Briefcase } from 'lucide-react';
+import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, ArrowRight, Briefcase, Award } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-
-const bizBenefits = [
-  { icon: Target, title: 'Targeted Exposure', description: 'Position your business directly in front of club decision-makers, players, and local rugby communities.' },
-  { icon: Handshake, title: 'Direct Sponsorships', description: 'Seamlessly find clubs seeking everything from kit sponsorships to stadium asset rights.' },
-  { icon: Shield, title: 'B2B Trust Badge', description: 'Stand out as an officially verified commercial supplier vetted explicitly for the rugby sector.' },
-  { icon: Award, title: 'Community Impact', description: 'Build authentic local brand loyalty by backing grassroots and tier-structured rugby frameworks.' },
-];
 
 interface Business {
   id: string;
@@ -17,13 +10,17 @@ interface Business {
   location: string;
   description: string;
   website: string | null;
+  email: string | null;
   logo_url: string | null;
+  looking_for?: string | null;
+  investment_range?: string | null;
 }
 
 export default function BusinessNetworkPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [expandedBizId, setExpandedBizId] = useState<string | null>(null);
 
   useEffect(() => {
     async function getBusinesses() {
@@ -31,7 +28,7 @@ export default function BusinessNetworkPage() {
         const { data, error } = await supabase.from('businesses').select('*').order('name', { ascending: true });
         if (!error && data) setBusinesses(data);
       } catch (err) {
-        console.error('Error loading business network listings:', err);
+        console.error('Error loading businesses:', err);
       } finally {
         setLoading(false);
       }
@@ -45,117 +42,151 @@ export default function BusinessNetworkPage() {
     biz.location.toLowerCase().includes(search.toLowerCase())
   );
 
+  const toggleExpand = (id: string) => {
+    setExpandedBizId(expandedBizId === id ? null : id);
+  };
+
   return (
-    <div>
-      {/* Brand-Matched Dark Navy Hero Header */}
-      <section className="bg-[#002366]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
-          <div className="max-w-2xl">
-            <p className="text-amber-400 text-xs font-bold uppercase tracking-[0.2em] mb-6">Commercial Partners</p>
-            <h1 className="text-4xl lg:text-5xl font-bold text-white uppercase leading-[1.1] mb-6 tracking-tight">
-              Sponsor Clubs & Grow Your Business Network
+    <div className="bg-white min-h-screen">
+      {/* Clean White/Navy Top Header to Match Rest of Site */}
+      <section className="bg-white border-b border-slate-100 py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <span className="text-amber-600 text-xs font-bold uppercase tracking-[0.2em] bg-amber-50 px-3 py-1.5 rounded border border-amber-100">Premium Commercial Tier</span>
+            <h1 className="text-3xl lg:text-5xl font-black text-[#002366] uppercase tracking-tight mt-6 mb-4">
+              Commercial Business Network
             </h1>
-            <p className="text-lg text-white/70 leading-relaxed mb-6">
-              Connect directly with rugby clubs seeking commercial backing. Gain exclusive access to local networks, decision-makers, and high-impact sports advertising placements.
+            <p className="text-base text-slate-500 leading-relaxed mb-6">
+              Connect directly with verified corporate sponsors and B2B providers backing rugby infrastructures. Access kit allocations, physical marketing placements, and cross-tier network operations.
             </p>
             <Link
               to="/business-registration"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-amber-500 text-[#002366] font-bold text-sm uppercase tracking-wider rounded hover:bg-amber-400 transition-colors duration-200 shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#002366] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#001a4d] transition-all"
             >
-              Join the Commercial Network
-              <ArrowRight size={16} />
+              Join Paid Commercial Network
+              <ArrowRight size={14} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Interactive Business Directory Lookup */}
-      <section className="bg-slate-50 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Verified Commercial Partners</h2>
-              <p className="text-sm text-slate-500 mt-1">Discover vetted corporate entities and club service providers.</p>
-            </div>
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by supplier name, industry or city..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
-              />
-            </div>
+      {/* Directory Search Section */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Verified Corporate Entities</h2>
+            <p className="text-xs text-slate-400">Click any partner row card to read corporate investment objectives and route contacts.</p>
           </div>
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search by keyword, domain or industry..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+            />
+          </div>
+        </div>
 
-          {loading ? (
-            <div className="text-center py-12 text-slate-400 text-sm">Loading verified partner registry...</div>
-          ) : filteredBiz.length === 0 ? (
-            <div className="text-center bg-white border border-slate-200 rounded-lg py-16 px-4">
-              <p className="text-slate-400 text-sm">No business network partners match that lookup query.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredBiz.map((biz) => (
-                <div key={biz.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-all flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-4 mb-4">
+        {loading ? (
+          <div className="text-center py-12 text-slate-400 text-xs tracking-wider uppercase">Syncing partner registry...</div>
+        ) : filteredBiz.length === 0 ? (
+          <div className="text-center bg-slate-50 border border-slate-200 rounded-lg py-12">
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">No matching corporate logs found</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredBiz.map((biz) => {
+              const isExpanded = expandedBizId === biz.id;
+
+              return (
+                <div 
+                  key={biz.id} 
+                  className={`bg-white border transition-all duration-200 rounded-lg overflow-hidden cursor-pointer ${
+                    isExpanded ? 'border-[#002366] shadow-md' : 'border-slate-200 hover:border-slate-400 shadow-sm'
+                  }`}
+                  onClick={() => toggleExpand(biz.id)}
+                >
+                  {/* Master Card Row */}
+                  <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
                       {biz.logo_url ? (
-                        <img src={biz.logo_url} alt="" className="w-14 h-14 object-contain rounded border border-slate-100 p-1 bg-white" />
+                        <img src={biz.logo_url} alt="" className="w-16 h-16 object-contain rounded border border-slate-100 p-1 bg-white shrink-0" />
                       ) : (
-                        <div className="w-14 h-14 bg-amber-500 text-[#002366] rounded flex items-center justify-center font-bold text-xl">
+                        <div className="w-16 h-16 bg-slate-100 text-[#002366] border border-slate-200 rounded flex items-center justify-center font-black text-xl shrink-0">
                           {biz.name?.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <h3 className="font-bold text-slate-900 text-base leading-tight">{biz.name}</h3>
-                        <div className="flex flex-col gap-0.5 mt-1">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#002366]">
-                            <Briefcase size={10} /> {biz.category || 'Commercial Partner'}
+                        <h3 className="font-bold text-slate-900 text-lg leading-tight flex items-center gap-2">
+                          {biz.name}
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded">
+                            <Award size={10} /> Corporate Partner
                           </span>
-                          <div className="flex items-center gap-1 text-slate-400 text-xs">
-                            <MapPin size={11} /> <span>{biz.location}</span>
+                        </h3>
+                        <div className="flex items-center gap-4 text-slate-400 text-xs mt-1.5 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[#002366] font-bold uppercase tracking-wider text-[10px]">
+                            <Briefcase size={12} /> {biz.category || 'Commercial Network Asset'}
+                          </span>
+                          <span className="flex items-center gap-0.5">
+                            <MapPin size={12} /> {biz.location}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 self-end sm:self-center text-[#002366] text-xs font-bold uppercase tracking-wider">
+                      <span>{isExpanded ? 'Collapse Profile' : 'Expand Details'}</span>
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </div>
+                  </div>
+
+                  {/* Collapsible Deep Corporate Profile Content Panel */}
+                  {isExpanded && (
+                    <div className="border-t border-slate-100 bg-slate-50/50 p-6 space-y-6" onClick={(e) => e.stopPropagation()}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 space-y-4">
+                          <div>
+                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Corporate Profile & Framework</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed">{biz.description || 'No descriptive overview filled yet.'}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Target Sponsorship Strategy & What We Look For</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-3 rounded italic">
+                              "{biz.looking_for || 'Actively seeking strategic clubs for kit arrangements, asset placements, and operational alignment.'}"
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4 self-start shadow-sm">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Operational Bounds</h4>
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between"><span className="text-slate-400">Industry Sector:</span><span className="font-bold text-slate-700">{biz.category}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-400">Target Range:</span><span className="font-bold text-amber-600">{biz.investment_range || 'Flexible Allocations'}</span></div>
+                          </div>
+                          
+                          <div className="pt-2 space-y-2">
+                            {biz.website && (
+                              <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Globe size={12} /> Visit Website Link
+                              </a>
+                            )}
+                            {biz.email && (
+                              <a href={`mailto:${biz.email}?subject=Rugby%20Fan%20Network%20B2B%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Mail size={12} /> Contact Corporate Ally
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-6">{biz.description || 'No description provided.'}</p>
-                  </div>
-                  {biz.website && (
-                    <a href={biz.website} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors hover:text-[#002366] hover:border-[#002366]/30">
-                      <Globe size={12} /> Contact Partner
-                    </a>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Business Network Benefits Grid Section with Accent Highlights */}
-      <section className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
-          <div className="max-w-2xl mb-16">
-            <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">Why Partner With Us</p>
-            <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Commercial Network Benefits</h2>
-            <p className="text-slate-500 text-lg">Gain premium marketing reach while helping grassroots and elite rugby structures grow.</p>
+              );
+            })}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-200 rounded-lg overflow-hidden">
-            {bizBenefits.map((b) => (
-              <div key={b.title} className="bg-white p-8 flex gap-5">
-                <div className="w-10 h-10 shrink-0 rounded bg-[#002366] flex items-center justify-center">
-                  <b.icon size={18} className="text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2">{b.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{b.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
       </section>
     </div>
   );
