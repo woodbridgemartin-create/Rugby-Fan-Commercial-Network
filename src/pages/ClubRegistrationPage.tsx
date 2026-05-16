@@ -11,7 +11,7 @@ export default function ClubRegistrationPage() {
     contactName: '', 
     email: '', 
     website: '',
-    description: '' // Added description state slot
+    description: '' 
   });
   const [badgeFile, setBadgeFile] = useState<File | null>(null);
   const [badgePreview, setBadgePreview] = useState<string | null>(null);
@@ -65,14 +65,16 @@ export default function ClubRegistrationPage() {
 
     const website = sanitizeUrl(form.website);
 
-    // Maps exactly to the public.clubs table layout in Supabase
+    // Maps to EVERY possible logo column naming option to force total compatibility
     const { error } = await supabase.from('clubs').insert({
       name: form.name,
       location: form.location,
       contact_email: form.email,
       contact_name: form.contactName,
       website: website || null,
-      logo_url: badgeUrl, // Maps to logo_url column instead of 'logo'
+      logo_url: badgeUrl,     // Mapping Variant A
+      logo: badgeUrl,         // Mapping Variant B
+      club_badge: badgeUrl,   // Mapping Variant C
       description: form.description,
     });
 
