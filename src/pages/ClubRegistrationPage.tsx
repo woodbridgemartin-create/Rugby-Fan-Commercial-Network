@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight } from 'lucide-react';
+import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, Facebook, Image } from 'lucide-react';
 
 export default function ClubRegistrationPage() {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ export default function ClubRegistrationPage() {
     infrastructure_needs: '',
     main_contact_email: '',
     website: '',
+    facebook_url: '',
     logo_url: ''
   });
 
@@ -34,6 +35,7 @@ export default function ClubRegistrationPage() {
           infrastructure_needs: formData.infrastructure_needs,
           main_contact_email: formData.main_contact_email,
           website: formData.website || null,
+          facebook_url: formData.facebook_url || null,
           logo_url: formData.logo_url || null,
         }
       ]);
@@ -118,7 +120,7 @@ export default function ClubRegistrationPage() {
             </div>
           </div>
 
-          {/* Section 2: Missing Profiles & Explanations added directly here */}
+          {/* Section 2: Commercial Details */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">2. Commercial Pitch Details</h3>
             
@@ -129,7 +131,7 @@ export default function ClubRegistrationPage() {
                 <textarea
                   required
                   rows={3}
-                  placeholder="Tell businesses about your history, active teams, junior sections, and local reach..."
+                  placeholder="Tell businesses about your history, active senior teams, mini/junior sections, and match-day footfall..."
                   value={formData.summary}
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
@@ -144,7 +146,7 @@ export default function ClubRegistrationPage() {
                 <textarea
                   required
                   rows={3}
-                  placeholder="e.g. Seeking funding for new match kits, digital scoreboard branding, or clubhouse maintenance assets..."
+                  placeholder="e.g. Seeking sponsors for main-kit asset branding, pitchside perimeter board placements, or youth section kit supply..."
                   value={formData.infrastructure_needs}
                   onChange={(e) => setFormData({ ...formData, infrastructure_needs: e.target.value })}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
@@ -153,13 +155,13 @@ export default function ClubRegistrationPage() {
             </div>
           </div>
 
-          {/* Section 3: Channels & Links */}
+          {/* Section 3: Channels & Media Assets */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">3. Communication Channels</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">3. Media Channels & Media Assets</h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Main Contact Email *</label>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Main Commercial Contact Email *</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <input
@@ -188,15 +190,34 @@ export default function ClubRegistrationPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Optional Logo Link (URL)</label>
-              <input
-                type="text"
-                placeholder="https://example.com/club-badge.png"
-                value={formData.logo_url}
-                onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Facebook Page URL</label>
+                <div className="relative">
+                  <Facebook className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="facebook.com/yourclub"
+                    value={formData.facebook_url}
+                    onChange={(e) => setFormData({ ...formData, facebook_url: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Badge / Logo URL</label>
+                <div className="relative">
+                  <Image className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="https://example.com/badge.png"
+                    value={formData.logo_url}
+                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
