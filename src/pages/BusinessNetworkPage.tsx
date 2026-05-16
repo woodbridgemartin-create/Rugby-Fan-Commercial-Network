@@ -68,35 +68,35 @@ export default function BusinessNetworkPage() {
   return (
     <div className="bg-white min-h-screen antialiased">
       
-      {/* SECTION 1: Clean Brand Pitch Header */}
+      {/* SECTION 1: Fixed Rugby-Focused Content Header */}
       <header className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
             <span className="inline-flex items-center text-amber-700 text-xs font-bold uppercase tracking-widest bg-amber-50 border border-amber-100 px-3 py-1.5 rounded">
-              Premium Commercial Tier
+              Commercial Partners
             </span>
             <h1 className="text-3xl lg:text-5xl font-black text-[#002366] uppercase tracking-tight leading-none">
               Commercial Business Network
             </h1>
             <p className="text-base text-slate-500 leading-relaxed max-w-xl">
-              Connect directly with corporate sponsors and premium B2B service providers backing rugby infrastructures. Discover commercial kit placements, ground asset rights, and club network growth opportunities.
+              Connect directly with trusted corporate partners and local businesses looking to fund grassroots rugby. Discover available kit sponsorships, pitchside advertising board placements, and match-day community branding opportunities.
             </p>
             <Link
               to="/business-registration"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#002366] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#001a4d] transition-all shadow-sm"
             >
-              Join Paid Commercial Network
+              List Your Business Portfolio
               <ArrowRight size={14} />
             </Link>
           </div>
 
-          {/* Value Highlights Boxed Panel */}
+          {/* Value Highlights Panel */}
           <div className="lg:col-span-5 bg-slate-50 border border-slate-100 rounded-xl p-6 space-y-4 shadow-sm">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Network Perks</h3>
             <ul className="space-y-3 text-sm text-slate-600">
-              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> Direct pitch access to clubs</li>
-              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> High-impact sports advertising exposure</li>
-              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> Premium verified business network badge</li>
+              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> Direct visibility to rugby club committees and decision-makers</li>
+              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> Secure pitchside branding, scoreboard assets, and program ads</li>
+              <li className="flex items-start gap-2"><CheckCircle size={16} className="text-[#002366] shrink-0 mt-0.5" /> Premium verified business directory profile</li>
             </ul>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function BusinessNetworkPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Search Partners Directory</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Filter by primary operational industry or type keywords below.</p>
+              <p className="text-xs text-slate-400 mt-0.5">Filter commercial partners by primary industry or location.</p>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
@@ -141,7 +141,7 @@ export default function BusinessNetworkPage() {
         </div>
       </section>
 
-      {/* SECTION 3: Interactive Profile Display Grid */}
+      {/* SECTION 3: Deep Interactive Profile Records Display Grid */}
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         {loading ? (
           <div className="text-center py-16 text-slate-400 text-xs tracking-widest uppercase font-bold">Syncing live registry...</div>
@@ -208,8 +208,8 @@ export default function BusinessNetworkPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-2 space-y-4">
                           <div>
-                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Corporate Summary & Framework</h4>
-                            <p className="text-sm text-slate-600 leading-relaxed">{biz.description || 'No descriptive overview filled yet.'}</p>
+                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Corporate Summary & Services</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed">{biz.description || 'No description filled out yet.'}</p>
                           </div>
                           <div>
                             <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Target Sponsorship Strategy & What We Look For</h4>
@@ -220,7 +220,7 @@ export default function BusinessNetworkPage() {
                         </div>
 
                         <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 self-start shadow-sm">
-                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Operational Spectrum</h4>
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Partner Details</h4>
                           <div className="space-y-2 text-xs">
                             <div className="flex justify-between"><span className="text-slate-400">Industry Sector:</span><span className="font-bold text-slate-700">{biz.category}</span></div>
                             <div className="flex justify-between"><span className="text-slate-400">Target Range:</span><span className="font-bold text-amber-700">£{biz.investment_range || 'Flexible Allocations'}</span></div>
@@ -234,7 +234,7 @@ export default function BusinessNetworkPage() {
                             )}
                             {biz.email && (
                               <a href={`mailto:${biz.email}?subject=Network%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
-                                <Mail size={12} /> Email Corporate Partner
+                                <Mail size={12} /> Email Partner
                               </a>
                             )}
                           </div>
@@ -250,4 +250,5 @@ export default function BusinessNetworkPage() {
       </main>
     </div>
   );
+}
 }
