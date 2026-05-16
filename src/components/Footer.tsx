@@ -1,29 +1,24 @@
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-slate-900 text-white border-t border-slate-800 antialiased">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-slate-800 pb-8 mb-8">
+    <footer className="bg-slate-950 border-t border-slate-900 py-12 text-slate-400">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
-          {/* Main Brand Section - Removed the extra RF letters */}
-          <div className="space-y-4 md:col-span-1">
-            <Link to="/" className="inline-block">
-              <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                Rugby Fan
-              </span>
+          {/* Brand Info - RF Icon Box removed entirely */}
+          <div className="space-y-4">
+            <Link to="/" className="flex items-center gap-3">
+              <span className="text-xl font-bold text-white tracking-tight">Rugby Fan</span>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+            <p className="text-sm text-slate-400 leading-relaxed">
               The UK's Commercial Rugby Network. Connecting clubs with businesses across the rugby community.
             </p>
           </div>
 
-          {/* Quick Links Navigation */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Navigation</h4>
-            <ul className="space-y-2 text-sm text-slate-300 font-medium">
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-4">Navigation</h3>
+            <ul className="space-y-2 text-sm">
               <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
               <li><Link to="/clubs" className="hover:text-white transition-colors">Clubs Directory</Link></li>
               <li><Link to="/business-network" className="hover:text-white transition-colors">Business Network</Link></li>
@@ -31,25 +26,18 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Connect Section */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Support</h4>
-            <ul className="space-y-2 text-sm text-slate-300 font-medium">
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-4">Support</h3>
+            <ul className="space-y-2 text-sm">
               <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li className="text-slate-500">United Kingdom</li>
+              <li>United Kingdom</li>
             </ul>
           </div>
-
         </div>
 
-        {/* Bottom Copyright Strip */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-semibold uppercase tracking-wider">
-          <div>
-            &copy; {currentYear} Rugby Fan. All rights reserved.
-          </div>
-          <div className="flex gap-6">
-            <span className="text-slate-600">Commercial Rugby Network</span>
-          </div>
+        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-medium uppercase tracking-wider text-slate-500">
+          <p>&copy; 2026 Rugby Fan. All rights reserved.</p>
+          <p>Commercial Rugby Network</p>
         </div>
       </div>
     </footer>
