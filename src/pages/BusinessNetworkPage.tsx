@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Globe, ArrowRight, Briefcase, User } from 'lucide-react';
