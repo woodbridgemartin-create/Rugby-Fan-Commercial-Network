@@ -66,8 +66,6 @@ export default function BusinessNetworkPage() {
 
   return (
     <div className="bg-white min-h-screen antialiased">
-      
-      {/* SECTION 1: Brand Pitch Header */}
       <header className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
@@ -89,7 +87,6 @@ export default function BusinessNetworkPage() {
             </Link>
           </div>
 
-          {/* Value Highlights Panel */}
           <div className="lg:col-span-5 bg-slate-50 border border-slate-100 rounded-xl p-6 space-y-4 shadow-sm">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Network Perks</h3>
             <ul className="space-y-3 text-sm text-slate-600">
@@ -101,7 +98,6 @@ export default function BusinessNetworkPage() {
         </div>
       </header>
 
-      {/* SECTION 2: Filter/Search Control Hub */}
       <section className="bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -138,7 +134,6 @@ export default function BusinessNetworkPage() {
         </div>
       </section>
 
-      {/* SECTION 3: Display List */}
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         {loading ? (
           <div className="text-center py-16 text-slate-400 text-xs tracking-widest uppercase font-bold">Syncing live registry...</div>
@@ -164,3 +159,29 @@ export default function BusinessNetworkPage() {
                     isExpanded ? 'border-[#002366] shadow-md' : 'border-slate-200 hover:border-slate-400 shadow-sm'
                   }`}
                   onClick={() => setExpandedBizId(isExpanded ? null : biz.id)}
+                >
+                  <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      {biz.logo_url ? (
+                        <img src={biz.logo_url} alt="" className="w-14 h-14 object-contain rounded-lg border border-slate-100 p-1 bg-white shrink-0" />
+                      ) : (
+                        <div className="w-14 h-14 bg-slate-50 text-[#002366] border border-slate-200 rounded-lg flex items-center justify-center font-black text-xl shrink-0">
+                          {biz.name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-base lg:text-lg leading-tight flex items-center gap-2">
+                          {biz.name}
+                          <span className="inline-flex items-center gap-0.5 text-[9px] font-extrabold uppercase tracking-widest text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
+                            <Award size={10} /> Verified Partner
+                          </span>
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-xs mt-1.5 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[#002366] font-bold uppercase tracking-wider text-[10px]">
+                            <Briefcase size={11} /> {biz.category || 'Commercial Ally'}
+                          </span>
+                          <span className="flex items-center gap-0.5">
+                            <MapPin size={11} /> {biz.location}
+                          </span>
+                        </div>
+                      </div>
