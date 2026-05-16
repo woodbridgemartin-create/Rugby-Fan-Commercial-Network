@@ -11,6 +11,7 @@ export default function ClubRegistrationPage() {
     location: '',
     description: '',
     website: '',
+    facebook_url: '',
     email: '',
     contact_name: '',
     logo_url: ''
@@ -46,8 +47,31 @@ export default function ClubRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
+    let formattedWebsite = formData.website.trim();
+    if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
+      formattedWebsite = `https://${formattedWebsite}`;
+    }
+
+    let formattedFB = formData.facebook_url.trim();
+    if (formattedFB && !/^https?:\/\//i.test(formattedFB)) {
+      formattedFB = `https://${formattedFB}`;
+    }
+
+    const submissionPayload = {
+      name: formData.name,
+      league: formData.league,
+      location: formData.location,
+      description: formData.description,
+      website: formattedWebsite,
+      facebook_url: formattedFB,
+      email: formData.email,
+      contact_name: formData.contact_name,
+      logo_url: formData.logo_url
+    };
+
     try {
-      const { error } = await supabase.from('clubs').insert([formData]);
+      const { error } = await supabase.from('clubs').insert([submissionPayload]);
       if (!error) navigate('/directory');
     } catch (err) {
       console.error(err);
@@ -77,7 +101,6 @@ export default function ClubRegistrationPage() {
           </div>
         </div>
 
-        {/* Club Logo File Drop/Upload Component */}
         <div>
           <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Club Crest / Badge Logo</label>
           <div className="border border-dashed border-slate-200 bg-slate-50 rounded-lg p-4 flex flex-col items-center justify-center text-center">
@@ -103,16 +126,22 @@ export default function ClubRegistrationPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Club Website</label>
-            <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
+            <input type="text" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="yourclub.co.uk" />
+          </div>
+          <div>
+            <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Facebook Page URL</label>
+            <input type="text" value={formData.facebook_url} onChange={e => setFormData({...formData, facebook_url: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="facebook.com/yourclub" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Contact Email Address *</label>
+            <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
           </div>
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Primary Contact Name</label>
             <input type="text" value={formData.contact_name} onChange={e => setFormData({...formData, contact_name: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
           </div>
-        </div>
-        <div>
-          <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Contact Email Address *</label>
-          <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
         </div>
         <div>
           <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Available Sponsorship Packages Overview</label>
