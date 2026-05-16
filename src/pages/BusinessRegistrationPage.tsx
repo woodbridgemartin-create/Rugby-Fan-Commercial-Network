@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, HelpCircle } from 'lucide-react';
@@ -53,13 +52,18 @@ export default function BusinessRegistrationPage() {
     
     const finalizedCategory = formData.category === 'Other' ? formData.custom_category : formData.category;
     
-    // Create clean payload for database schema submission
+    // Auto-format website link if they forgot to include protocol
+    let formattedWebsite = formData.website.trim();
+    if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
+      formattedWebsite = `https://${formattedWebsite}`;
+    }
+
     const submissionPayload = {
       name: formData.name,
       category: finalizedCategory,
       location: formData.location,
       description: formData.description,
-      website: formData.website,
+      website: formattedWebsite,
       email: formData.email,
       contact_name: formData.contact_name,
       investment_range: formData.investment_range,
@@ -117,7 +121,6 @@ export default function BusinessRegistrationPage() {
           </div>
         )}
 
-        {/* Logo Real File Upload Block */}
         <div>
           <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Company Logo</label>
           <div className="border border-dashed border-slate-200 bg-slate-50 rounded-lg p-4 flex flex-col items-center justify-center text-center">
@@ -143,7 +146,7 @@ export default function BusinessRegistrationPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Website URL</label>
-            <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
+            <input type="text" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="example.com" />
           </div>
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Contact Name</label>
@@ -162,7 +165,7 @@ export default function BusinessRegistrationPage() {
               <div className="group relative cursor-help">
                 <HelpCircle size={12} className="text-slate-400" />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-white text-[9px] p-2 rounded whitespace-nowrap z-50">
-                  Gives clubs clarity on what level of sponsorship assets you can comfortably support.
+                  Gives clubs clarity on what level of sponsorship assets you can support.
                 </div>
               </div>
             </div>
