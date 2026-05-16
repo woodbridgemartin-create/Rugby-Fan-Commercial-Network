@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Upload } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function ClubRegistrationPage() {
@@ -14,7 +15,33 @@ export default function ClubRegistrationPage() {
     contact_name: '',
     logo_url: ''
   });
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setUploading(true);
+    try {
+      const file = e.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `club-${Date.now()}.${fileExt}`;
+      const filePath = `club-logos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('logos').getPublicUrl(filePath);
+      setFormData(prev => ({ ...prev, logo_url: data.publicUrl }));
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert('Logo upload failed. Please ensure your Supabase storage bucket named "logos" exists and has a public policy enabled.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,10 +76,30 @@ export default function ClubRegistrationPage() {
             <input type="text" required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
           </div>
         </div>
+
+        {/* Club Logo File Drop/Upload Component */}
         <div>
-          <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Club Logo Image URL</label>
-          <input type="url" value={formData.logo_url} onChange={e => setFormData({...formData, logo_url: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="https://example.com/club-badge.png" />
+          <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Club Crest / Badge Logo</label>
+          <div className="border border-dashed border-slate-200 bg-slate-50 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+            {formData.logo_url ? (
+              <div className="space-y-2">
+                <img src={formData.logo_url} alt="Uploaded crest" className="h-16 w-auto object-contain mx-auto border bg-white p-1 rounded" />
+                <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Crest Uploaded Successfully</p>
+                <label className="cursor-pointer text-[#002366] font-semibold underline text-[10px] block">Change Badge
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                </label>
+              </div>
+            ) : (
+              <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-2">
+                <Upload size={20} className="text-slate-400 mb-1" />
+                <span className="font-bold text-slate-700 block">{uploading ? 'Processing File...' : 'Choose Badge File'}</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">Supports PNG, JPG, JPEG up to 2MB</span>
+                <input type="file" accept="image/*" disabled={uploading} onChange={handleFileUpload} className="hidden" />
+              </label>
+            )}
+          </div>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Club Website</label>
@@ -71,7 +118,7 @@ export default function ClubRegistrationPage() {
           <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Available Sponsorship Packages Overview</label>
           <textarea rows={4} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="e.g. First XV Main Shirt Sponsor open, post pad configurations, match day program blocks..." />
         </div>
-        <button type="submit" disabled={submitting} className="w-full py-3 bg-[#002366] text-white font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] disabled:opacity-50">
+        <button type="submit" disabled={submitting || uploading} className="w-full py-3 bg-[#002366] text-white font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] disabled:opacity-50">
           {submitting ? 'Publishing Club...' : 'Register Club'}
         </button>
       </form>
