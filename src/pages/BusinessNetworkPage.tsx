@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, ArrowRight, Briefcase, Award } from 'lucide-react';
+import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, ArrowRight, Briefcase } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Business {
