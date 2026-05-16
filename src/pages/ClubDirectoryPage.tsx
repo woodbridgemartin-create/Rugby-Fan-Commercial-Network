@@ -195,7 +195,7 @@ export default function ClubsDirectoryPage() {
                           <div>
                             <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Target Commercial Requirements & Infrastructure Needs</h4>
                             <p className="text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-3 rounded-lg italic">
-                              "{club.infrastructure_needs || 'Currently welcoming inquiries for standard main-kit placement setups, board inventory branding, or digital reach.'}"
+                              {club.infrastructure_needs || 'Currently welcoming inquiries for standard main-kit placement setups, board inventory branding, or digital reach.'}
                             </p>
                           </div>
                         </div>
@@ -210,4 +210,26 @@ export default function ClubsDirectoryPage() {
                           
                           <div className="pt-2 space-y-2 border-t border-slate-100">
                             {club.website && (
-                              <a href={club.website.startsWith('http
+                              <a href={club.website.startsWith('http') ? club.website : `https://${club.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Globe size={12} /> Visit Official Site
+                              </a>
+                            )}
+                            {club.main_contact_email && (
+                              <a href={`mailto:${club.main_contact_email}?subject=Commercial%20Sponsorship%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Mail size={12} /> Contact Commercial Lead
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
