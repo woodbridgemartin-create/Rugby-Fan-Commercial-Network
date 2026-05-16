@@ -1,206 +1,216 @@
-import { useState, useRef, type FormEvent, type DragEvent } from 'react';
-import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { sanitizeUrl } from '../lib/categories';
+import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight } from 'lucide-react';
 
 export default function ClubRegistrationPage() {
-  const [form, setForm] = useState({ 
-    name: '', 
-    location: '', 
-    contactName: '', 
-    email: '', 
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    league: '',
+    summary: '',
+    infrastructure_needs: '',
+    main_contact_email: '',
     website: '',
-    description: '' 
+    logo_url: ''
   });
-  const [badgeFile, setBadgeFile] = useState<File | null>(null);
-  const [badgePreview, setBadgePreview] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  const fileRef = useRef<HTMLInputElement>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
-      setBadgeFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setBadgePreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function handleDrop(e: DragEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
-      setBadgeFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setBadgePreview(reader.result as string);
-      reader.readAsDataURL(file);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error: submitError } = await supabase.from('clubs').insert([
+        {
+          name: formData.name,
+          location: formData.location,
+          league: formData.league || null,
+          summary: formData.summary,
+          infrastructure_needs: formData.infrastructure_needs,
+          main_contact_email: formData.main_contact_email,
+          website: formData.website || null,
+          logo_url: formData.logo_url || null,
+        }
+      ]);
+
+      if (submitError) throw submitError;
+      navigate('/clubs');
+    } catch (err: any) {
+      console.error('Error creating club profile:', err);
+      setError(err.message || 'Failed to register club profile.');
+    } finally {
+      setLoading(false);
     }
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setStatus('submitting');
-
-    let badgeUrl: string | null = null;
-    if (badgeFile) {
-      const ext = badgeFile.name.split('.').pop() || 'png';
-      const path = `club-badges/${Date.now()}.${ext}`;
-      
-      // Uploading to your public 'logos' storage bucket
-      const { error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(path, badgeFile, { upsert: true });
-        
-      if (!uploadError) {
-        const { data } = supabase.storage.from('logos').getPublicUrl(path);
-        badgeUrl = data.publicUrl;
-      } else {
-        console.error('Storage Upload Error:', uploadError);
-      }
-    }
-
-    const website = sanitizeUrl(form.website);
-
-    // Maps to EVERY possible logo column naming option to force total compatibility
-    const { error } = await supabase.from('clubs').insert({
-      name: form.name,
-      location: form.location,
-      contact_email: form.email,
-      contact_name: form.contactName,
-      website: website || null,
-      logo_url: badgeUrl,     // Mapping Variant A
-      logo: badgeUrl,         // Mapping Variant B
-      club_badge: badgeUrl,   // Mapping Variant C
-      description: form.description,
-    });
-
-    if (error) { 
-      console.error('Database Insertion Error:', error);
-      setStatus('error'); 
-      return; 
-    }
-    
-    setStatus('success');
-  }
-
-  if (status === 'success') {
-    return (
-      <div className="py-24 lg:py-32">
-        <div className="max-w-lg mx-auto px-6 text-center">
-          <div className="w-16 h-16 mx-auto rounded bg-green-50 flex items-center justify-center mb-6">
-            <CheckCircle size={32} className="text-green-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">Registration Complete</h1>
-          <p className="text-slate-500 mb-8">
-            Your club has been registered successfully. We'll review your listing and be in touch soon.
-          </p>
-          <Link to="/" className="inline-flex items-center gap-2 text-[#002366] font-bold text-sm uppercase tracking-wider hover:underline">
-            <ArrowLeft size={14} />
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="py-16 lg:py-24 bg-slate-50 min-h-screen">
-      <div className="max-w-lg mx-auto px-6 lg:px-8">
-        <div className="mb-12">
-          <Link to="/clubs" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-[#002366] transition-colors mb-6">
-            <ArrowLeft size={14} />
-            Back to Clubs
-          </Link>
-          <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-3">Free Registration</p>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Register Your Club</h1>
-          <p className="text-slate-500">
-            It's completely free for clubs to join Rugby Fan. Fill in the details below and we'll get your profile set up.
-          </p>
+    <div className="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8 antialiased">
+      <div className="max-w-2xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        
+        <div className="bg-[#002366] p-8 text-white">
+          <span className="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Club Network Registry</span>
+          <h1 className="text-2xl font-black uppercase tracking-tight">Register Club Profile</h1>
+          <p className="text-slate-300 text-xs mt-1">List your rugby club to connect directly with corporate sponsors and commercial partners.</p>
         </div>
 
-        {status === 'error' && (
-          <div className="px-4 py-3 mb-6 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-            Something went wrong. Please try again.
+        {error && (
+          <div className="bg-red-50 border-b border-red-200 p-4 text-red-700 text-xs font-semibold">
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-8 space-y-6">
-          {/* Badge Upload Component */}
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Club Badge / Crest</label>
-            <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => fileRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
-                dragOver ? 'border-[#002366] bg-[#002366]/5' : 'border-slate-200 hover:border-slate-300'
-              }`}
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          
+          {/* Section 1: Core Identity */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">1. Club Identity</h3>
+            
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Name *</label>
+              <div className="relative">
+                <Shield className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Cardiff Community RFC"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Location / Town *</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Cardiff"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">League / Division *</label>
+                <div className="relative">
+                  <Award className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Community League"
+                    value={formData.league}
+                    onChange={(e) => setFormData({ ...formData, league: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Missing Profiles & Explanations added directly here */}
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">2. Commercial Pitch Details</h3>
+            
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Overview & Community Summary *</label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Tell businesses about your history, active teams, junior sections, and local reach..."
+                  value={formData.summary}
+                  onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Target Commercial Requirements & Infrastructure Needs *</label>
+              <div className="relative">
+                <Target className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="e.g. Seeking funding for new match kits, digital scoreboard branding, or clubhouse maintenance assets..."
+                  value={formData.infrastructure_needs}
+                  onChange={(e) => setFormData({ ...formData, infrastructure_needs: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Channels & Links */}
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#002366] border-b border-slate-100 pb-2">3. Communication Channels</h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Main Contact Email *</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="commercial@yourclub.com"
+                    value={formData.main_contact_email}
+                    onChange={(e) => setFormData({ ...formData, main_contact_email: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Website URL</label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="www.yourclub.com"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Optional Logo Link (URL)</label>
+              <input
+                type="text"
+                placeholder="https://example.com/club-badge.png"
+                value={formData.logo_url}
+                onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#002366] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#001a4d] transition-all disabled:bg-slate-300 shadow-sm"
             >
-              {badgePreview ? (
-                <div className="flex flex-col items-center gap-3">
-                  <img src={badgePreview} alt="Badge preview" className="w-16 h-16 object-contain" />
-                  <p className="text-xs text-slate-400">Click or drag to replace</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Upload size={24} className="text-slate-300" />
-                  <p className="text-sm text-slate-500">Drag and drop your badge here</p>
-                  <p className="text-xs text-slate-400">or click to browse</p>
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-            </div>
-            <div className="flex items-center gap-4 mt-2">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${badgeFile ? 'text-green-600' : 'text-slate-300'}`}>
-                {badgeFile ? `${badgeFile.name} (${(badgeFile.size / 1024).toFixed(0)}KB)` : 'No file selected'}
-              </span>
-              <span className="text-[10px] text-slate-300">PNG, SVG, JPG — Max 5MB</span>
-            </div>
+              {loading ? 'Publishing Profile...' : 'Publish Club Profile'}
+              <ArrowRight size={14} />
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Club Name *</label>
-            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London Rugby Club" />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Location *</label>
-            <input type="text" required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Club Description</label>
-            <textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all resize-none" placeholder="Provide details about your club teams, history, or recruitment goals..." />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Contact Email *</label>
-            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. info@yourclub.co.uk" />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Contact Name</label>
-            <input type="text" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. John Smith" />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Website</label>
-            <input type="text" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="yourclub.co.uk" />
-            <p className="text-[10px] text-slate-400 mt-1">https:// will be added automatically if omitted</p>
-          </div>
-          
-          <button
-            type="submit"
-            disabled={status === 'submitting'}
-            className="w-full py-4 bg-[#002366] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors duration-200 disabled:opacity-50"
-          >
-            {status === 'submitting' ? 'Registering...' : 'Register Your Club — Free'}
-          </button>
         </form>
       </div>
     </div>
