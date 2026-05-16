@@ -49,15 +49,17 @@ export default function BusinessNetworkPage() {
     <div className="bg-slate-50 min-h-screen p-6 antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* Header Block */}
+        {/* Header Block — FIXED COPY */}
         <div className="bg-[#002366] text-white p-8 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
           <div>
-            <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Commercial Network</span>
-            <h1 className="text-3xl font-black uppercase tracking-tight">Business Partners</h1>
-            <p className="text-slate-300 text-xs mt-1 max-w-xl">Connect with trusted businesses looking to sponsor kit assets, perimeter boards, and community club initiatives.</p>
+            <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Rugby Club Resources</span>
+            <h1 className="text-3xl font-black uppercase tracking-tight">Available Corporate Sponsors</h1>
+            <p className="text-slate-300 text-xs mt-1 max-w-xl">
+              Clubs: Browse trusted businesses across the network ready to fund kit assets, ground perimeter boards, and local community initiatives.
+            </p>
           </div>
           <Link to="/business-registration" className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#002366] font-bold text-xs uppercase tracking-wider rounded shadow hover:bg-slate-100 shrink-0 transition-colors">
-            Join the Network <ArrowRight size={14} />
+            List Your Business <ArrowRight size={14} />
           </Link>
         </div>
 
@@ -101,9 +103,13 @@ export default function BusinessNetworkPage() {
                 >
                   <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-100 text-[#002366] border border-slate-200 rounded-lg flex items-center justify-center font-black text-lg shrink-0">
-                        {biz.name.charAt(0).toUpperCase()}
-                      </div>
+                      {biz.logo_url ? (
+                        <img src={biz.logo_url} alt={biz.name} className="w-12 h-12 rounded-lg object-contain border border-slate-200 bg-white" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                      ) : (
+                        <div className="w-12 h-12 bg-slate-100 text-[#002366] border border-slate-200 rounded-lg flex items-center justify-center font-black text-lg shrink-0">
+                          {biz.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-bold text-slate-900 text-base flex items-center gap-1.5">{biz.name}</h3>
                         <div className="flex items-center gap-3 text-xs text-slate-400 mt-1 font-medium">
