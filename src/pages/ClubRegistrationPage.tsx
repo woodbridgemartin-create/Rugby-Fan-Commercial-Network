@@ -1,0 +1,176 @@
+import { useState, useRef, type FormEvent, type DragEvent } from 'react';
+import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { sanitizeUrl } from '../lib/categories';
+
+export default function ClubRegistrationPage() {
+  const [form, setForm] = useState({ name: '', location: '', contact: '', email: '', website: '' });
+  const [badgeFile, setBadgeFile] = useState<File | null>(null);
+  const [badgePreview, setBadgePreview] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      setBadgeFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setBadgePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      setBadgeFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setBadgePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setStatus('submitting');
+
+    let logoUrl: string | null = null;
+    if (badgeFile) {
+      const ext = badgeFile.name.split('.').pop() || 'png';
+      const path = `club-badges/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(path, badgeFile, { upsert: true });
+      if (!uploadError) {
+        const { data } = supabase.storage.from('logos').getPublicUrl(path);
+        logoUrl = data.publicUrl;
+      }
+    }
+
+    const website = sanitizeUrl(form.website);
+
+    const { error } = await supabase.from('clubs').insert({
+      name: form.name,
+      location: form.location,
+      contact: form.contact || form.email,
+      logo: logoUrl,
+      website: website || null,
+    });
+
+    if (error) { setStatus('error'); return; }
+    setStatus('success');
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="py-24 lg:py-32">
+        <div className="max-w-lg mx-auto px-6 text-center">
+          <div className="w-16 h-16 mx-auto rounded bg-green-50 flex items-center justify-center mb-6">
+            <CheckCircle size={32} className="text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">Registration Complete</h1>
+          <p className="text-slate-500 mb-8">
+            Your club has been registered successfully. We'll review your listing and be in touch soon.
+          </p>
+          <Link to="/" className="inline-flex items-center gap-2 text-[#002366] font-bold text-sm uppercase tracking-wider hover:underline">
+            <ArrowLeft size={14} />
+            Back to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-16 lg:py-24 bg-slate-50 min-h-screen">
+      <div className="max-w-lg mx-auto px-6 lg:px-8">
+        <div className="mb-12">
+          <Link to="/clubs" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-[#002366] transition-colors mb-6">
+            <ArrowLeft size={14} />
+            Back to Clubs
+          </Link>
+          <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-3">Free Registration</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Register Your Club</h1>
+          <p className="text-slate-500">
+            It's completely free for clubs to join Rugby Fan. Fill in the details below and we'll get your profile set up.
+          </p>
+        </div>
+
+        {status === 'error' && (
+          <div className="px-4 py-3 mb-6 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+            Something went wrong. Please try again.
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-8 space-y-6">
+          {/* Badge Upload */}
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Club Badge / Crest</label>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileRef.current?.click()}
+              className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
+                dragOver ? 'border-[#002366] bg-[#002366]/5' : 'border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              {badgePreview ? (
+                <div className="flex flex-col items-center gap-3">
+                  <img src={badgePreview} alt="Badge preview" className="w-16 h-16 object-contain" />
+                  <p className="text-xs text-slate-400">Click or drag to replace</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <Upload size={24} className="text-slate-300" />
+                  <p className="text-sm text-slate-500">Drag and drop your badge here</p>
+                  <p className="text-xs text-slate-400">or click to browse</p>
+                </div>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            </div>
+            <div className="flex items-center gap-4 mt-2">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${badgeFile ? 'text-green-600' : 'text-slate-300'}`}>
+                {badgeFile ? `${badgeFile.name} (${(badgeFile.size / 1024).toFixed(0)}KB)` : 'No file selected'}
+              </span>
+              <span className="text-[10px] text-slate-300">PNG, SVG, JPG — Max 5MB</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Club Name *</label>
+            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London Rugby Club" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Location *</label>
+            <input type="text" required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Contact Email *</label>
+            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. info@yourclub.co.uk" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Contact Name</label>
+            <input type="text" value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. John Smith" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Website</label>
+            <input type="text" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="yourclub.co.uk" />
+            <p className="text-[10px] text-slate-400 mt-1">https:// will be added automatically if omitted</p>
+          </div>
+          <button
+            type="submit"
+            disabled={status === 'submitting'}
+            className="w-full py-4 bg-[#002366] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors duration-200 disabled:opacity-50"
+          >
+            {status === 'submitting' ? 'Registering...' : 'Register Your Club — Free'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
