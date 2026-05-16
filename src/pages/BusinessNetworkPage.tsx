@@ -185,3 +185,59 @@ export default function BusinessNetworkPage() {
                           </span>
                         </div>
                       </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 self-end sm:self-center text-[#002366] text-xs font-bold uppercase tracking-wider">
+                      <span>{isExpanded ? 'Collapse Profile' : 'Expand Details'}</span>
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="border-t border-slate-100 bg-slate-50/50 p-6 space-y-6" onClick={(e) => e.stopPropagation()}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 space-y-4">
+                          <div>
+                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Corporate Summary & Services</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed">{biz.description || 'No description filled out yet.'}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Target Sponsorship Strategy & What We Look For</h4>
+                            <p className="text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-3 rounded-lg italic">
+                              "{biz.looking_for || 'Actively seeking strategic clubs for kit arrangements, asset placements, and operational alignment.'}"
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 self-start shadow-sm">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Partner Details</h4>
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between"><span className="text-slate-400">Industry Sector:</span><span className="font-bold text-slate-700">{biz.category}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-400">Target Range:</span><span className="font-bold text-amber-700">£{biz.investment_range || 'Flexible Allocations'}</span></div>
+                          </div>
+                          
+                          <div className="pt-2 space-y-2 border-t border-slate-100">
+                            {biz.website && (
+                              <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Globe size={12} /> Visit Website
+                              </a>
+                            )}
+                            {biz.email && (
+                              <a href={`mailto:${biz.email}?subject=Network%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                                <Mail size={12} /> Email Partner
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
