@@ -53,7 +53,6 @@ export default function BusinessNetworkPage() {
     getBusinesses();
   }, []);
 
-  // Filtering Logic
   const filteredBiz = businesses.filter(biz => {
     const matchesSearch = biz.name.toLowerCase().includes(search.toLowerCase()) || 
                           biz.location.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,7 +67,7 @@ export default function BusinessNetworkPage() {
   return (
     <div className="bg-white min-h-screen antialiased">
       
-      {/* SECTION 1: Fixed Rugby-Focused Content Header */}
+      {/* SECTION 1: Brand Pitch Header */}
       <header className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
@@ -112,7 +111,6 @@ export default function BusinessNetworkPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-              {/* Organized Industry Dropdown Box */}
               <div className="w-full sm:w-56">
                 <select
                   value={selectedIndustry}
@@ -125,7 +123,6 @@ export default function BusinessNetworkPage() {
                 </select>
               </div>
 
-              {/* Clean Keywords Search Input Field */}
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3.5 top-3 h-3.5 w-3.5 text-slate-400" />
                 <input
@@ -141,7 +138,7 @@ export default function BusinessNetworkPage() {
         </div>
       </section>
 
-      {/* SECTION 3: Deep Interactive Profile Records Display Grid */}
+      {/* SECTION 3: Display List */}
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         {loading ? (
           <div className="text-center py-16 text-slate-400 text-xs tracking-widest uppercase font-bold">Syncing live registry...</div>
@@ -167,88 +164,3 @@ export default function BusinessNetworkPage() {
                     isExpanded ? 'border-[#002366] shadow-md' : 'border-slate-200 hover:border-slate-400 shadow-sm'
                   }`}
                   onClick={() => setExpandedBizId(isExpanded ? null : biz.id)}
-                >
-                  {/* Master Card Row */}
-                  <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      {biz.logo_url ? (
-                        <img src={biz.logo_url} alt="" className="w-14 h-14 object-contain rounded-lg border border-slate-100 p-1 bg-white shrink-0" />
-                      ) : (
-                        <div className="w-14 h-14 bg-slate-50 text-[#002366] border border-slate-200 rounded-lg flex items-center justify-center font-black text-xl shrink-0">
-                          {biz.name?.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-bold text-slate-900 text-base lg:text-lg leading-tight flex items-center gap-2">
-                          {biz.name}
-                          <span className="inline-flex items-center gap-0.5 text-[9px] font-extrabold uppercase tracking-widest text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
-                            <Award size={10} /> Verified Partner
-                          </span>
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-xs mt-1.5 font-medium">
-                          <span className="inline-flex items-center gap-1 text-[#002366] font-bold uppercase tracking-wider text-[10px]">
-                            <Briefcase size={11} /> {biz.category || 'Commercial Ally'}
-                          </span>
-                          <span className="flex items-center gap-0.5">
-                            <MapPin size={11} /> {biz.location}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 self-end sm:self-center text-[#002366] text-xs font-bold uppercase tracking-wider">
-                      <span>{isExpanded ? 'Collapse Profile' : 'Expand Details'}</span>
-                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </div>
-                  </div>
-
-                  {/* Collapsible Deep Corporate Profile Content Panel */}
-                  {isExpanded && (
-                    <div className="border-t border-slate-100 bg-slate-50/50 p-6 space-y-6" onClick={(e) => e.stopPropagation()}>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 space-y-4">
-                          <div>
-                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Corporate Summary & Services</h4>
-                            <p className="text-sm text-slate-600 leading-relaxed">{biz.description || 'No description filled out yet.'}</p>
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-[#002366] uppercase tracking-wider mb-1">Target Sponsorship Strategy & What We Look For</h4>
-                            <p className="text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-3 rounded-lg italic">
-                              "{biz.looking_for || 'Actively seeking strategic clubs for kit arrangements, asset placements, and operational alignment.'}"
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 self-start shadow-sm">
-                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Partner Details</h4>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between"><span className="text-slate-400">Industry Sector:</span><span className="font-bold text-slate-700">{biz.category}</span></div>
-                            <div className="flex justify-between"><span className="text-slate-400">Target Range:</span><span className="font-bold text-amber-700">£{biz.investment_range || 'Flexible Allocations'}</span></div>
-                          </div>
-                          
-                          <div className="pt-2 space-y-2 border-t border-slate-100">
-                            {biz.website && (
-                              <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
-                                <Globe size={12} /> Visit Website
-                              </a>
-                            )}
-                            {biz.email && (
-                              <a href={`mailto:${biz.email}?subject=Network%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
-                                <Mail size={12} /> Email Partner
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-}
