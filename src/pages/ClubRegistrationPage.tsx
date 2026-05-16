@@ -5,7 +5,14 @@ import { supabase } from '../lib/supabase';
 import { sanitizeUrl } from '../lib/categories';
 
 export default function ClubRegistrationPage() {
-  const [form, setForm] = useState({ name: '', location: '', contact: '', email: '', website: '' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    location: '', 
+    contactName: '', 
+    email: '', 
+    website: '',
+    description: '' // Added description state slot
+  });
   const [badgeFile, setBadgeFile] = useState<File | null>(null);
   const [badgePreview, setBadgePreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -38,30 +45,43 @@ export default function ClubRegistrationPage() {
     e.preventDefault();
     setStatus('submitting');
 
-    let logoUrl: string | null = null;
+    let badgeUrl: string | null = null;
     if (badgeFile) {
       const ext = badgeFile.name.split('.').pop() || 'png';
       const path = `club-badges/${Date.now()}.${ext}`;
+      
+      // Uploading to your public 'logos' storage bucket
       const { error: uploadError } = await supabase.storage
         .from('logos')
         .upload(path, badgeFile, { upsert: true });
+        
       if (!uploadError) {
         const { data } = supabase.storage.from('logos').getPublicUrl(path);
-        logoUrl = data.publicUrl;
+        badgeUrl = data.publicUrl;
+      } else {
+        console.error('Storage Upload Error:', uploadError);
       }
     }
 
     const website = sanitizeUrl(form.website);
 
+    // Maps exactly to the public.clubs table layout in Supabase
     const { error } = await supabase.from('clubs').insert({
       name: form.name,
       location: form.location,
-      contact: form.contact || form.email,
-      logo: logoUrl,
+      contact_email: form.email,
+      contact_name: form.contactName,
       website: website || null,
+      logo_url: badgeUrl, // Maps to logo_url column instead of 'logo'
+      description: form.description,
     });
 
-    if (error) { setStatus('error'); return; }
+    if (error) { 
+      console.error('Database Insertion Error:', error);
+      setStatus('error'); 
+      return; 
+    }
+    
     setStatus('success');
   }
 
@@ -107,7 +127,7 @@ export default function ClubRegistrationPage() {
         )}
 
         <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-8 space-y-6">
-          {/* Badge Upload */}
+          {/* Badge Upload Component */}
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Club Badge / Crest</label>
             <div
@@ -145,23 +165,33 @@ export default function ClubRegistrationPage() {
             <label className="block text-sm font-bold text-slate-900 mb-2">Club Name *</label>
             <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London Rugby Club" />
           </div>
+          
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Location *</label>
             <input type="text" required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. London" />
           </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Club Description</label>
+            <textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all resize-none" placeholder="Provide details about your club teams, history, or recruitment goals..." />
+          </div>
+
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Contact Email *</label>
             <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. info@yourclub.co.uk" />
           </div>
+          
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Contact Name</label>
-            <input type="text" value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. John Smith" />
+            <input type="text" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="e.g. John Smith" />
           </div>
+          
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Website</label>
             <input type="text" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" placeholder="yourclub.co.uk" />
             <p className="text-[10px] text-slate-400 mt-1">https:// will be added automatically if omitted</p>
           </div>
+          
           <button
             type="submit"
             disabled={status === 'submitting'}
