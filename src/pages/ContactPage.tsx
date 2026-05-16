@@ -1,103 +1,242 @@
-import { useState, type FormEvent } from 'react';
-import { Send, Mail } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { Mail, MapPin, Send, HelpCircle, Trophy, Building, AlertCircle } from 'lucide-react';
 
 export default function ContactPage() {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    type: 'business', // 'club' or 'business'
+    subject: '',
+    message: ''
+  });
+  
+  const [status, setStatus] = useState<{
+    submitting: boolean;
+    success: boolean;
+    error: string | null;
+  }>({
+    submitting: false,
+    success: false,
+    error: null
+  });
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('sending');
-
-    const form = e.currentTarget;
-    const data = new FormData(form);
+    setStatus({ submitting: true, success: false, error: null });
 
     try {
-      const res = await fetch('https://formspree.io/f/xqeggzyn', {
+      const response = await fetch('https://formspree.io/f/xqeggzyn', {
         method: 'POST',
-        body: data,
-        headers: { Accept: 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          Name: formData.name,
+          Email: formData.email,
+          Account_Type: formData.type,
+          Subject: formData.subject,
+          Message: formData.message
+        })
       });
 
-      if (res.ok) {
-        setStatus('sent');
-        form.reset();
+      if (response.ok) {
+        setStatus({ submitting: false, success: true, error: null });
+        setFormData({ name: '', email: '', type: 'business', subject: '', message: '' });
       } else {
-        setStatus('error');
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to safely transmit data payload.');
       }
-    } catch {
-      setStatus('error');
+    } catch (err: any) {
+      console.error('Formspree Submission Error:', err);
+      setStatus({
+        submitting: false,
+        success: false,
+        error: err.message || 'An unexpected networking issue occurred. Please try again.'
+      });
     }
-  }
+  };
 
   return (
-    <div className="py-20 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-2xl mb-20">
-          <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">Contact Us</p>
-          <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Get in Touch</h1>
-          <p className="text-slate-500 text-lg">Have a question or ready to join? We'd love to hear from you.</p>
+    <div className="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 antialiased">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Editorial Title Header */}
+        <div className="bg-[#002366] text-white p-8 rounded-2xl shadow-sm text-center md:text-left">
+          <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Get In Touch</span>
+          <h1 className="text-3xl font-black uppercase tracking-tight">Contact the Network Team</h1>
+          <p className="text-slate-300 text-xs mt-2 max-w-xl mx-auto md:mx-0">
+            Have questions about your directory profile, annual Founding Member subscriptions, or custom enterprise branding setups? Drop us a line below.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
-          <div className="lg:col-span-2">
-            <div className="flex gap-4">
-              <div className="w-10 h-10 shrink-0 rounded bg-[#002366]/10 flex items-center justify-center">
-                <Mail size={18} className="text-[#002366]" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Column 1 & 2: Contact Form */}
+          <div className="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            {status.success ? (
+              <div className="text-center py-12 space-y-3">
+                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
+                  <Send size={20} />
+                </div>
+                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Message Transmitted</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Thank you for reaching out. Your entry has been wired to Formspree. A platform representative from the Rugby Fan team will review your inquiry shortly.
+                </p>
+                <button 
+                  onClick={() => setStatus({ submitting: false, success: false, error: null })}
+                  className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded transition-colors"
+                >
+                  Send Another Message
+                </button>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 mb-1">Email</h3>
-                <a href="mailto:hello@rugbyfan.co.uk" className="text-sm text-slate-500 hover:text-[#002366] transition-colors">
-                  hello@rugbyfan.co.uk
-                </a>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+                
+                {/* Error Banner state */}
+                {status.error && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg flex items-center gap-2 font-medium">
+                    <AlertCircle size={16} className="shrink-0" />
+                    <span>{status.error}</span>
+                  </div>
+                )}
+
+                {/* Form Segmentation Row */}
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">I am reaching out regarding a:</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className={`border rounded-xl p-3 flex items-center gap-2.5 cursor-pointer transition-all ${formData.type === 'club' ? 'border-[#002366] bg-slate-50 font-bold text-[#002366]' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
+                      <input 
+                        type="radio" 
+                        name="type" 
+                        value="club" 
+                        checked={formData.type === 'club'}
+                        onChange={(e) => setFormData({...formData, type: e.target.value})}
+                        className="sr-only" 
+                      />
+                      <Trophy size={16} className={formData.type === 'club' ? 'text-[#002366]' : 'text-slate-400'} />
+                      <span>Rugby Club Profile</span>
+                    </label>
+
+                    <label className={`border rounded-xl p-3 flex items-center gap-2.5 cursor-pointer transition-all ${formData.type === 'business' ? 'border-[#002366] bg-slate-50 font-bold text-[#002366]' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
+                      <input 
+                        type="radio" 
+                        name="type" 
+                        value="business" 
+                        checked={formData.type === 'business'}
+                        onChange={(e) => setFormData({...formData, type: e.target.value})}
+                        className="sr-only" 
+                      />
+                      <Building size={16} className={formData.type === 'business' ? 'text-[#002366]' : 'text-slate-400'} />
+                      <span>Business Membership</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Name & Email Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block font-bold text-slate-600 uppercase tracking-wider">Your Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366]" 
+                      placeholder="e.g. Martin Woodbridge"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="block font-bold text-slate-600 uppercase tracking-wider">Email Address</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366]" 
+                      placeholder="name@company.co.uk"
+                    />
+                  </div>
+                </div>
+
+                {/* Subject Line */}
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-600 uppercase tracking-wider">Subject</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={formData.subject}
+                    onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366]" 
+                    placeholder="How can we help your organisation?"
+                  />
+                </div>
+
+                {/* Message Box */}
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-600 uppercase tracking-wider">Message Detail</label>
+                  <textarea 
+                    rows={5}
+                    required
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366] resize-none" 
+                    placeholder="Please lay out your detailed query or requirements here..."
+                  />
+                </div>
+
+                {/* Submit Action Button */}
+                <button 
+                  type="submit" 
+                  disabled={status.submitting}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#002366] hover:bg-[#001a4d] text-white font-bold uppercase tracking-wider text-[10px] rounded transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {status.submitting ? 'Transmitting...' : 'Submit Inquiry'} <Send size={12} />
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Column 3: Contact Sidebar Details */}
+          <div className="space-y-4">
+            
+            {/* Direct Channel Box */}
+            <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-4 text-xs">
+              <h3 className="font-bold text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-2">Direct Contact</h3>
+              
+              <div className="flex items-start gap-3">
+                <Mail size={16} className="text-[#002366] shrink-0 mt-0.5" />
+                <div>
+                  <span className="block font-bold text-slate-700">General & Sales Support</span>
+                  <a href="mailto:hello@rugbyfan.co.uk" className="text-[#002366] font-semibold hover:underline">hello@rugbyfan.co.uk</a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <HelpCircle size={16} className="text-[#002366] shrink-0 mt-0.5" />
+                <div>
+                  <span className="block font-bold text-slate-700">Response Window</span>
+                  <span className="text-slate-500">Monday - Friday<br />09:00 - 17:00 GMT</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
-                  <input name="firstName" required className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
-                  <input name="lastName" required className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" />
-                </div>
+            {/* Corporate Attribution Card */}
+            <div className="bg-slate-900 text-white p-5 rounded-2xl shadow-sm space-y-2 text-[11px] leading-relaxed">
+              <h3 className="font-bold text-amber-400 uppercase tracking-wide text-xs">Corporate Office</h3>
+              <p className="text-slate-300">
+                Rugby Fan is a commercial data platform owned, maintained, and operated completely by <strong>Leadsopedia Limited</strong>.
+              </p>
+              <div className="flex items-center gap-1.5 text-slate-400 mt-2">
+                <MapPin size={12} className="text-amber-400 shrink-0" />
+                <span>Registered Operator &bull; United Kingdom</span>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-                <input name="email" type="email" required className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">I am a...</label>
-                <select name="type" className="w-full px-4 py-3 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all cursor-pointer">
-                  <option value="club">Rugby Club</option>
-                  <option value="business">Business</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Message</label>
-                <textarea name="message" rows={5} required className="w-full px-4 py-3 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all resize-none" />
-              </div>
-              <button
-                type="submit"
-                disabled={status === 'sending'}
-                className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#002366] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors duration-200 disabled:opacity-50"
-              >
-                {status === 'sending' ? 'Sending...' : 'Send Message'}
-                <Send size={14} />
-              </button>
-              {status === 'sent' && (
-                <p className="text-green-600 text-sm font-medium">Message sent successfully. We'll be in touch soon.</p>
-              )}
-              {status === 'error' && (
-                <p className="text-red-600 text-sm font-medium">Something went wrong. Please try again.</p>
-              )}
-            </form>
+            </div>
+
           </div>
         </div>
+
       </div>
     </div>
   );
