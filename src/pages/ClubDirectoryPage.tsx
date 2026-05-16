@@ -19,6 +19,8 @@ export default function ClubsDirectoryPage() {
 
   useEffect(() => {
     async function fetchClubs() {
+     useEffect(() => {
+    async function fetchClubs() {
       const { data, error } = await supabase
         .from('clubs')
         .select('*')
@@ -30,8 +32,7 @@ export default function ClubsDirectoryPage() {
       setLoading(false);
     }
     fetchClubs();
-  } [], []);
-
+  }, []); // <-- Fixed typo here (removed the extra duplicate array)
   const filteredClubs = clubs.filter(club => 
     club.name.toLowerCase().includes(search.toLowerCase()) ||
     club.location.toLowerCase().includes(search.toLowerCase())
