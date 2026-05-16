@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, ArrowRight, Briefcase } from 'lucide-react';
+import { Search, MapPin, Globe, ArrowRight, Briefcase, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Business {
@@ -14,6 +14,7 @@ interface Business {
   logo_url: string | null;
   looking_for?: string | null;
   investment_range?: string | null;
+  contact_name?: string | null;
 }
 
 export default function BusinessNetworkPage() {
@@ -53,10 +54,10 @@ export default function BusinessNetworkPage() {
           <div>
             <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Commercial Network</span>
             <h1 className="text-3xl font-black uppercase tracking-tight">Business Partners</h1>
-            <p className="text-slate-300 text-xs mt-1 max-w-xl">Connect directly with trusted local businesses looking to sponsor kit assets, perimeter boards, and community club initiatives.</p>
+            <p className="text-slate-300 text-xs mt-1 max-w-xl">Connect with trusted businesses looking to sponsor kit assets, perimeter boards, and community club initiatives.</p>
           </div>
           <Link to="/business-registration" className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#002366] font-bold text-xs uppercase tracking-wider rounded shadow hover:bg-slate-100 shrink-0 transition-colors">
-            List Portfolio <ArrowRight size={14} />
+            Join the Network <ArrowRight size={14} />
           </Link>
         </div>
 
@@ -112,14 +113,19 @@ export default function BusinessNetworkPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-[#002366] text-xs font-bold uppercase tracking-wider self-end sm:self-center">
-                      <span>{isExpanded ? 'Hide' : 'View'}</span>
-                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      <span>{isExpanded ? 'Hide Info' : 'View Info'}</span>
                     </div>
                   </div>
 
                   {isExpanded && (
                     <div className="p-5 border-t border-slate-100 bg-slate-50 grid grid-cols-1 md:grid-cols-3 gap-6" onClick={(e) => e.stopPropagation()}>
                       <div className="md:col-span-2 space-y-3">
+                        {biz.contact_name && (
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg w-fit">
+                            <User size={13} className="text-slate-400" />
+                            <span>Contact Person: {biz.contact_name}</span>
+                          </div>
+                        )}
                         <div>
                           <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Profile Overview</h4>
                           <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{biz.description || 'No summary overview provided.'}</p>
@@ -132,8 +138,18 @@ export default function BusinessNetworkPage() {
                       <div className="bg-white border border-slate-200 p-4 rounded-xl space-y-3 shadow-sm text-xs self-start">
                         <div className="flex justify-between"><span className="text-slate-400">Budget Limit:</span><span className="font-bold text-amber-700">£{biz.investment_range || 'Flexible'}</span></div>
                         <div className="pt-2 border-t border-slate-100 space-y-2">
-                          {biz.website && <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 w-full py-2 border border-slate-200 rounded text-slate-700 font-bold uppercase tracking-wider text-[10px] bg-white hover:bg-slate-50 transition-colors"><Globe size={12} /> Website</a>}
-                          {biz.email && <a href={`mailto:${biz.email}`} className="flex items-center justify-center gap-1.5 w-full py-2 bg-[#002366] text-white rounded font-bold uppercase tracking-wider text-[10px] hover:bg-[#001a4d] transition-colors"><Mail size={12} /> Contact</a>}
+                          {biz.website ? (
+                            <a 
+                              href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="flex items-center justify-center gap-1.5 w-full py-2.5 bg-[#002366] text-white rounded font-bold uppercase tracking-wider text-[10px] hover:bg-[#001a4d] transition-colors"
+                            >
+                              <Globe size={12} /> Apply via Website
+                            </a>
+                          ) : (
+                            <span className="text-center block text-slate-400 text-[10px] italic py-2">No external website linked</span>
+                          )}
                         </div>
                       </div>
                     </div>
