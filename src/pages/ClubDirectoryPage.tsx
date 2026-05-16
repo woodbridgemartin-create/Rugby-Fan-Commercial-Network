@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, User, Shield, CheckCircle, ArrowRight, Award } from 'lucide-react';
+import { Search, MapPin, Globe, Mail, ChevronDown, ChevronUp, Shield, CheckCircle, ArrowRight, Award } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Club {
@@ -44,7 +44,7 @@ export default function ClubsDirectoryPage() {
   return (
     <div className="bg-white min-h-screen antialiased">
       
-      {/* SECTION 1: Brand Header & New Club Benefits Dashboard */}
+      {/* SECTION 1: Brand Header & Club Benefits Dashboard */}
       <header className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -68,7 +68,7 @@ export default function ClubsDirectoryPage() {
             </Link>
           </div>
 
-          {/* NEW: Explicit Club Benefits Information Box */}
+          {/* Club Benefits Information Box */}
           <div className="lg:col-span-6 bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-5 shadow-sm">
             <div>
               <h3 className="text-xs font-black uppercase tracking-wider text-[#002366]">Why Register Your Club?</h3>
@@ -210,26 +210,4 @@ export default function ClubsDirectoryPage() {
                           
                           <div className="pt-2 space-y-2 border-t border-slate-100">
                             {club.website && (
-                              <a href={club.website.startsWith('http') ? club.website : `https://${club.website}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
-                                <Globe size={12} /> Visit Official Site
-                              </a>
-                            )}
-                            {club.main_contact_email && (
-                              <a href={`mailto:${club.main_contact_email}?subject=Commercial%20Sponsorship%20Inquiry`} className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#002366] hover:bg-[#001a4d] text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
-                                <Mail size={12} /> Contact Commercial Lead
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
+                              <a href={club.website.startsWith('http
