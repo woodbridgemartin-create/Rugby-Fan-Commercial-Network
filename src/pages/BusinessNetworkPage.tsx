@@ -47,20 +47,20 @@ export default function BusinessNetworkPage() {
 
   return (
     <div>
-      {/* Business Marketing Pitch Header */}
-      <section className="bg-slate-900">
+      {/* Brand-Matched Dark Navy Hero Header */}
+      <section className="bg-[#002366]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-2xl">
-            <p className="text-amber-500 text-xs font-bold uppercase tracking-[0.2em] mb-6">Commercial Partners</p>
+            <p className="text-amber-400 text-xs font-bold uppercase tracking-[0.2em] mb-6">Commercial Partners</p>
             <h1 className="text-4xl lg:text-5xl font-bold text-white uppercase leading-[1.1] mb-6 tracking-tight">
               Sponsor Clubs & Grow Your Business Network
             </h1>
-            <p className="text-lg text-slate-400 leading-relaxed mb-6">
+            <p className="text-lg text-white/70 leading-relaxed mb-6">
               Connect directly with rugby clubs seeking commercial backing. Gain exclusive access to local networks, decision-makers, and high-impact sports advertising placements.
             </p>
             <Link
               to="/business-registration"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-amber-500 text-slate-900 font-bold text-sm uppercase tracking-wider rounded hover:bg-amber-400 transition-colors duration-200"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-amber-500 text-[#002366] font-bold text-sm uppercase tracking-wider rounded hover:bg-amber-400 transition-colors duration-200 shadow-sm"
             >
               Join the Commercial Network
               <ArrowRight size={16} />
@@ -69,7 +69,7 @@ export default function BusinessNetworkPage() {
         </div>
       </section>
 
-      {/* Interactive Paid Business Directory Lookup */}
+      {/* Interactive Business Directory Lookup */}
       <section className="bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
@@ -84,7 +84,7 @@ export default function BusinessNetworkPage() {
                 placeholder="Search by supplier name, industry or city..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
               />
             </div>
           </div>
@@ -104,14 +104,14 @@ export default function BusinessNetworkPage() {
                       {biz.logo_url ? (
                         <img src={biz.logo_url} alt="" className="w-14 h-14 object-contain rounded border border-slate-100 p-1 bg-white" />
                       ) : (
-                        <div className="w-14 h-14 bg-amber-500 text-slate-900 rounded flex items-center justify-center font-bold text-xl">
+                        <div className="w-14 h-14 bg-amber-500 text-[#002366] rounded flex items-center justify-center font-bold text-xl">
                           {biz.name?.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div>
                         <h3 className="font-bold text-slate-900 text-base leading-tight">{biz.name}</h3>
                         <div className="flex flex-col gap-0.5 mt-1">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#002366]">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#002366]">
                             <Briefcase size={10} /> {biz.category || 'Commercial Partner'}
                           </span>
                           <div className="flex items-center gap-1 text-slate-400 text-xs">
@@ -123,7 +123,7 @@ export default function BusinessNetworkPage() {
                     <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-6">{biz.description || 'No description provided.'}</p>
                   </div>
                   {biz.website && (
-                    <a href={biz.website} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                    <a href={biz.website} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors hover:text-[#002366] hover:border-[#002366]/30">
                       <Globe size={12} /> Contact Partner
                     </a>
                   )}
@@ -134,19 +134,19 @@ export default function BusinessNetworkPage() {
         </div>
       </section>
 
-      {/* Business Network Benefits Grid Section */}
+      {/* Business Network Benefits Grid Section with Accent Highlights */}
       <section className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
           <div className="max-w-2xl mb-16">
-            <p className="text-amber-500 text-xs font-bold uppercase tracking-[0.2em] mb-4">Why Partner With Us</p>
+            <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">Why Partner With Us</p>
             <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Commercial Network Benefits</h2>
             <p className="text-slate-500 text-lg">Gain premium marketing reach while helping grassroots and elite rugby structures grow.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-200 rounded-lg overflow-hidden">
             {bizBenefits.map((b) => (
               <div key={b.title} className="bg-white p-8 flex gap-5">
-                <div className="w-10 h-10 shrink-0 rounded bg-slate-900 flex items-center justify-center">
-                  <b.icon size={18} className="text-amber-500" />
+                <div className="w-10 h-10 shrink-0 rounded bg-[#002366] flex items-center justify-center">
+                  <b.icon size={18} className="text-amber-400" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 mb-2">{b.title}</h3>
