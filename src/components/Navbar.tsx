@@ -4,7 +4,7 @@ import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { to: '/', label: 'Home' },
-  { to: '/clubs', label: 'Clubs' }, // This now powers your entire live search directory layout
+  { to: '/clubs', label: 'Clubs Directory' },
   { to: '/business-network', label: 'Business Network' },
   { to: '/faq', label: 'FAQ' },
 ];
@@ -21,21 +21,16 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-[#002366] rounded flex items-center justify-center">
               <span className="text-white font-bold text-lg">RF</span>
             </div>
-            <span className="text-xl font-bold text-[#002366] tracking-tight">
-              Rugby Fan
-            </span>
+            <span className="text-xl font-bold text-[#002366] tracking-tight">Rugby Fan</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 className={`text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
-                  location.pathname === link.to
-                    ? 'text-[#002366]'
-                    : 'text-slate-400 hover:text-[#002366]'
+                  location.pathname === link.to ? 'text-[#002366]' : 'text-slate-400 hover:text-[#002366]'
                 }`}
               >
                 {link.label}
@@ -49,17 +44,12 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-slate-400 hover:text-[#002366]"
-          >
+          <button onClick={() => setOpen(!open)} className="lg:hidden p-2 text-slate-400 hover:text-[#002366]">
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu Navigation */}
       {open && (
         <div className="lg:hidden border-t border-slate-200 bg-white">
           <div className="px-6 py-4 space-y-3">
@@ -69,9 +59,7 @@ export default function Navbar() {
                 to={link.to}
                 onClick={() => setOpen(false)}
                 className={`block text-xs font-bold uppercase tracking-wider py-2 ${
-                  location.pathname === link.to
-                    ? 'text-[#002366]'
-                    : 'text-slate-400'
+                  location.pathname === link.to ? 'text-[#002366]' : 'text-slate-400'
                 }`}
               >
                 {link.label}
