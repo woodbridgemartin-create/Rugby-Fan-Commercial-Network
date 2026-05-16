@@ -215,4 +215,51 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200 rounded-lg overflow-hidden">
             {howItWorks.map((step, i) => (
               <div key={step.title} className="bg-white p-8 lg:p-10">
-                <div className="w-10 h-10 rounded bg-[#002366] flex
+                <div className="w-10 h-10 rounded bg-[#002366] flex items-center justify-center mb-6">
+                  <step.icon size={18} className="text-white" />
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-300 mb-2">
+                  0{i + 1}
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
+          <div className="bg-[#002366] rounded-lg p-12 lg:p-20 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 uppercase tracking-tight">
+              Ready to Join the Network?
+            </h2>
+            <p className="text-white/50 text-lg mb-12 max-w-xl mx-auto">
+              Clubs join free. Businesses list as Premium Commercial Partners at £79/year.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/club-registration"
+                className="px-10 py-4 bg-white text-[#002366] font-bold text-sm uppercase tracking-wider rounded hover:bg-gray-100 transition-colors duration-200"
+              >
+                Register Your Club — Free
+              </Link>
+              <Link
+                to="/business-registration"
+                className="px-10 py-4 border border-white/30 text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                List Your Business
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
