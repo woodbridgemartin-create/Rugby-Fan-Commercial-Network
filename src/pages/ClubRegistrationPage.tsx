@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, Share2, Image } from 'lucide-react';
+import { Shield, MapPin, Award, Globe, FileText, Target, ArrowRight, Share2, Image } from 'lucide-react';
 
 export default function ClubRegistrationPage() {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ export default function ClubRegistrationPage() {
     league: '',
     summary: '',
     infrastructure_needs: '',
-    main_contact_email: '',
     website: '',
     facebook_url: '',
     logo_url: ''
@@ -33,7 +32,6 @@ export default function ClubRegistrationPage() {
           league: formData.league || null,
           summary: formData.summary,
           infrastructure_needs: formData.infrastructure_needs,
-          main_contact_email: formData.main_contact_email,
           website: formData.website || null,
           facebook_url: formData.facebook_url || null,
           logo_url: formData.logo_url || null,
@@ -88,7 +86,7 @@ export default function ClubRegistrationPage() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Club Overview *</label>
+            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Club Overview & Matchday Footfall *</label>
             <div className="relative">
               <FileText className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <textarea required rows={3} placeholder="Describe team footfall, history, and active divisions..." value={formData.summary} onChange={(e) => setFormData({ ...formData, summary: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
@@ -96,7 +94,7 @@ export default function ClubRegistrationPage() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Sponsorship Opportunities & Requirements *</label>
+            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Sponsorship Opportunities Available *</label>
             <div className="relative">
               <Target className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <textarea required rows={3} placeholder="e.g. Kit assets, perimeter training gear boards..." value={formData.infrastructure_needs} onChange={(e) => setFormData({ ...formData, infrastructure_needs: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
@@ -120,20 +118,11 @@ export default function ClubRegistrationPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Contact Email *</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <input type="email" required placeholder="commercial@club.com" value={formData.main_contact_email} onChange={(e) => setFormData({ ...formData, main_contact_email: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Website URL</label>
-              <div className="relative">
-                <Globe className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <input type="text" placeholder="www.club.com" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
-              </div>
+          <div>
+            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Official Club Website URL *</label>
+            <div className="relative">
+              <Globe className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <input type="text" required placeholder="www.club.com" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
             </div>
           </div>
 
