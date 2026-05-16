@@ -20,7 +20,8 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/directory" element={<DirectoryPage />} />
-          <Route path="/clubs" element={<ClubsPage />} />
+          {/* Swapped out the old static component for your searchable club directory */}
+          <Route path="/clubs" element={<ClubDirectoryPage />} />
           <Route path="/business-network" element={<BusinessNetworkPage />} />
           <Route path="/business-registration" element={<BusinessRegistrationPage />} />
           <Route path="/faq" element={<FAQPage />} />
