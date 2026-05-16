@@ -1,88 +1,152 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Target, ChartBar as BarChart3, Globe, Handshake, ArrowRight, Trophy, PoundSterling } from 'lucide-react';
+import { Target, Shield, Handshake, Award, ArrowRight, Search, MapPin, Globe, Briefcase } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
-const benefits = [
-  {
-    icon: Target,
-    title: 'Targeted Audience',
-    description: 'Reach the rugby community directly. Your products and services in front of the people who matter.',
-  },
-  {
-    icon: BarChart3,
-    title: 'Measurable Impact',
-    description: 'Track engagement and ROI through our platform with transparent reporting.',
-  },
-  {
-    icon: Globe,
-    title: 'National Reach',
-    description: 'Access clubs and fans across the entire UK rugby landscape from a single platform.',
-  },
-  {
-    icon: Handshake,
-    title: 'Partnership Opportunities',
-    description: 'Discover sponsorship, advertising, and collaboration opportunities with rugby clubs.',
-  },
+const bizBenefits = [
+  { icon: Target, title: 'Targeted Exposure', description: 'Position your business directly in front of club decision-makers, players, and local rugby communities.' },
+  { icon: Handshake, title: 'Direct Sponsorships', description: 'Seamlessly find clubs seeking everything from kit sponsorships to stadium asset rights.' },
+  { icon: Shield, title: 'B2B Trust Badge', description: 'Stand out as an officially verified commercial supplier vetted explicitly for the rugby sector.' },
+  { icon: Award, title: 'Community Impact', description: 'Build authentic local brand loyalty by backing grassroots and tier-structured rugby frameworks.' },
 ];
 
+interface Business {
+  id: string;
+  name: string;
+  category: string;
+  location: string;
+  description: string;
+  website: string | null;
+  logo_url: string | null;
+}
+
 export default function BusinessNetworkPage() {
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getBusinesses() {
+      try {
+        const { data, error } = await supabase.from('businesses').select('*').order('name', { ascending: true });
+        if (!error && data) setBusinesses(data);
+      } catch (err) {
+        console.error('Error loading business network listings:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getBusinesses();
+  }, []);
+
+  const filteredBiz = businesses.filter(biz =>
+    biz.name.toLowerCase().includes(search.toLowerCase()) ||
+    (biz.category && biz.category.toLowerCase().includes(search.toLowerCase())) ||
+    biz.location.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
-      <section className="bg-[#002366]">
+      {/* Business Marketing Pitch Header */}
+      <section className="bg-slate-900">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-2xl">
-            <p className="text-white/50 text-xs font-bold uppercase tracking-[0.2em] mb-6">
-              For Businesses
-            </p>
+            <p className="text-amber-500 text-xs font-bold uppercase tracking-[0.2em] mb-6">Commercial Partners</p>
             <h1 className="text-4xl lg:text-5xl font-bold text-white uppercase leading-[1.1] mb-6 tracking-tight">
-              Reach the Rugby Community
+              Sponsor Clubs & Grow Your Business Network
             </h1>
-            <p className="text-lg text-white/50 leading-relaxed mb-10">
-              Connect your brand with rugby clubs, fans, and the wider community. A dedicated commercial network built for the sport.
+            <p className="text-lg text-slate-400 leading-relaxed mb-6">
+              Connect directly with rugby clubs seeking commercial backing. Gain exclusive access to local networks, decision-makers, and high-impact sports advertising placements.
             </p>
             <Link
               to="/business-registration"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-white text-[#002366] font-bold text-sm uppercase tracking-wider rounded hover:bg-gray-100 transition-colors duration-200"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-amber-500 text-slate-900 font-bold text-sm uppercase tracking-wider rounded hover:bg-amber-400 transition-colors duration-200"
             >
-              List Your Business
+              Join the Commercial Network
               <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Altruistic Callout */}
-      <section className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
-          <div className="border border-slate-200 rounded-lg p-5 flex items-start gap-4">
-            <div className="w-8 h-8 rounded bg-[#002366]/10 flex items-center justify-center shrink-0 mt-0.5">
-              <PoundSterling size={16} className="text-[#002366]" />
-            </div>
+      {/* Interactive Paid Business Directory Lookup */}
+      <section className="bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
             <div>
-              <p className="text-sm font-bold text-slate-900 mb-0.5">Your listing supports grassroots rugby.</p>
-              <p className="text-sm text-slate-500">Every Premium Commercial Partner membership helps fund sponsorship opportunities and equipment grants for community clubs across the UK.</p>
+              <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Verified Commercial Partners</h2>
+              <p className="text-sm text-slate-500 mt-1">Discover vetted corporate entities and club service providers.</p>
+            </div>
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by supplier name, industry or city..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
             </div>
           </div>
+
+          {loading ? (
+            <div className="text-center py-12 text-slate-400 text-sm">Loading verified partner registry...</div>
+          ) : filteredBiz.length === 0 ? (
+            <div className="text-center bg-white border border-slate-200 rounded-lg py-16 px-4">
+              <p className="text-slate-400 text-sm">No business network partners match that lookup query.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredBiz.map((biz) => (
+                <div key={biz.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-4 mb-4">
+                      {biz.logo_url ? (
+                        <img src={biz.logo_url} alt="" className="w-14 h-14 object-contain rounded border border-slate-100 p-1 bg-white" />
+                      ) : (
+                        <div className="w-14 h-14 bg-amber-500 text-slate-900 rounded flex items-center justify-center font-bold text-xl">
+                          {biz.name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-base leading-tight">{biz.name}</h3>
+                        <div className="flex flex-col gap-0.5 mt-1">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#002366]">
+                            <Briefcase size={10} /> {biz.category || 'Commercial Partner'}
+                          </span>
+                          <div className="flex items-center gap-1 text-slate-400 text-xs">
+                            <MapPin size={11} /> <span>{biz.location}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-6">{biz.description || 'No description provided.'}</p>
+                  </div>
+                  {biz.website && (
+                    <a href={biz.website} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                      <Globe size={12} /> Contact Partner
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
+      {/* Business Network Benefits Grid Section */}
       <section className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
-          <div className="max-w-2xl mb-20">
-            <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">
-              Why Join
-            </p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-              Benefits for Businesses
-            </h2>
-            <p className="text-slate-500 text-lg">
-              Tap into a passionate, engaged community with real commercial intent.
-            </p>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
+          <div className="max-w-2xl mb-16">
+            <p className="text-amber-500 text-xs font-bold uppercase tracking-[0.2em] mb-4">Why Partner With Us</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Commercial Network Benefits</h2>
+            <p className="text-slate-500 text-lg">Gain premium marketing reach while helping grassroots and elite rugby structures grow.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-200 rounded-lg overflow-hidden">
-            {benefits.map((b) => (
-              <div key={b.title} className="bg-white p-8 lg:p-10 flex gap-5">
-                <div className="w-10 h-10 shrink-0 rounded bg-[#002366] flex items-center justify-center">
-                  <b.icon size={18} className="text-white" />
+            {bizBenefits.map((b) => (
+              <div key={b.title} className="bg-white p-8 flex gap-5">
+                <div className="w-10 h-10 shrink-0 rounded bg-slate-900 flex items-center justify-center">
+                  <b.icon size={18} className="text-amber-500" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 mb-2">{b.title}</h3>
@@ -90,101 +154,6 @@ export default function BusinessNetworkPage() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sponsorship */}
-      <section className="bg-slate-50 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">
-                Sponsorship
-              </p>
-              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6 tracking-tight">
-                Find Clubs to Sponsor
-              </h2>
-              <p className="text-slate-500 text-lg leading-relaxed mb-8">
-                Our network helps businesses find rugby clubs to sponsor at every level of the game. From grassroots community clubs to professional sides, connect with clubs actively seeking commercial partners.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Browse clubs across the UK seeking sponsorship',
-                  'Connect directly with club decision-makers',
-                  'Support the rugby community at any budget',
-                  'Build lasting brand partnerships with clubs',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#002366] mt-2 shrink-0" />
-                    <span className="text-slate-600 text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="border border-slate-200 rounded-lg p-10 bg-white">
-              <div className="text-center">
-                <Trophy size={36} className="text-[#002366] mx-auto mb-6" />
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Sponsor a Club</h3>
-                <p className="text-slate-500 text-sm mb-8">
-                  Browse clubs across the UK actively seeking sponsorship and make your mark on the rugby community.
-                </p>
-                <Link
-                  to="/directory"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#002366] text-white text-sm font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors"
-                >
-                  Find a Club
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
-          <div className="max-w-2xl mx-auto mb-16">
-            <p className="text-[#002366] text-xs font-bold uppercase tracking-[0.2em] mb-4">
-              Pricing
-            </p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-              Premium Commercial Partner
-            </h2>
-            <p className="text-slate-500 text-lg">
-              A single, transparent price. No tiers, no gimmicks.
-            </p>
-          </div>
-          <div className="max-w-md mx-auto bg-white border border-slate-200 rounded-lg p-10 text-center">
-            <span className="inline-block px-3 py-1 bg-[#002366]/10 text-[#002366] text-[10px] font-bold uppercase tracking-[0.15em] rounded mb-6">
-              Premium Commercial Partner
-            </span>
-            <div className="mb-8">
-              <div className="text-5xl font-bold text-slate-900">
-                £79<span className="text-lg font-normal text-slate-400">/year</span>
-              </div>
-            </div>
-            <ul className="text-left space-y-3 mb-10">
-              {[
-                'Premium directory listing',
-                'Priority search placement',
-                'Direct club introductions',
-                'Sponsorship matching',
-                'Supports grassroots rugby',
-              ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-sm text-slate-600">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#002366] shrink-0" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/business-registration"
-              className="block w-full py-4 bg-[#002366] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors duration-200"
-            >
-              Get Started
-            </Link>
           </div>
         </div>
       </section>
