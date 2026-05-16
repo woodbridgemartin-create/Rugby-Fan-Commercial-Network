@@ -1,4 +1,4 @@
--import { useState, useRef, type FormEvent, type DragEvent } from 'react';
+import { useState, useRef, type FormEvent, type DragEvent } from 'react';
 import { ArrowLeft, Upload, CheckCircle, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
