@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, Facebook, Image } from 'lucide-react';
+import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, Share2, Image } from 'lucide-react';
 
 export default function ClubRegistrationPage() {
   const navigate = useNavigate();
@@ -114,7 +114,7 @@ export default function ClubRegistrationPage() {
             <div>
               <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Facebook Page URL</label>
               <div className="relative">
-                <Facebook className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Share2 className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <input type="text" placeholder="facebook.com/clubname" value={formData.facebook_url} onChange={(e) => setFormData({ ...formData, facebook_url: e.target.value })} className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none" />
               </div>
             </div>
