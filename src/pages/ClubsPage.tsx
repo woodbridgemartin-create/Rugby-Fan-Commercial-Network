@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Megaphone, TrendingUp, Shield, ArrowRight } from 'lucide-react';
+import { Users, Megaphone, TrendingUp, Shield, ArrowRight, Search, MapPin, Globe } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const benefits = [
   {
@@ -24,9 +26,52 @@ const benefits = [
   },
 ];
 
+interface Club {
+  id: string;
+  name: string;
+  location: string;
+  description: string;
+  website: string | null;
+  logo_url: string | null;
+  logo: string | null;
+  club_badge: string | null;
+}
+
 export default function ClubsPage() {
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Fetch registered clubs from Supabase
+  useEffect(() => {
+    async function getClubs() {
+      try {
+        const { data, error } = await supabase
+          .from('clubs')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (!error && data) {
+          setClubs(data);
+        }
+      } catch (err) {
+        console.error('Error loading clubs directory:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getClubs();
+  }, []);
+
+  // Filter clubs live based on user search input
+  const filteredClubs = clubs.filter(club =>
+    club.name.toLowerCase().includes(search.toLowerCase()) ||
+    club.location.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
+      {/* Marketing Hero Section */}
       <section className="bg-[#002366]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-2xl">
@@ -53,6 +98,97 @@ export default function ClubsPage() {
         </div>
       </section>
 
+      {/* LIVE CLUBS LOOKUP ENGINE DIRECTORY */}
+      <section className="bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Registered Clubs Directory</h2>
+              <p className="text-sm text-slate-500 mt-1">Browse and connect with rugby clubs nationwide.</p>
+            </div>
+            
+            {/* Live Search Bar Box */}
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by club name or town..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#002366]/20 focus:border-[#002366] transition-all"
+              />
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12 text-slate-400 text-sm">Loading clubs profile data streams...</div>
+          ) : filteredClubs.length === 0 ? (
+            <div className="text-center bg-white border border-slate-200 rounded-lg py-16 px-4">
+              <p className="text-slate-400 text-sm">No registered clubs found matching that criteria.</p>
+            </div>
+          ) : (
+            /* Live Grid Cards Render */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredClubs.map((club) => {
+                const finalLogoUrl = club.logo_url || club.logo || club.club_badge;
+                const fallbackLetter = club.name ? club.name.charAt(0).toUpperCase() : 'R';
+
+                return (
+                  <div key={club.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-all flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-4 mb-4">
+                        {finalLogoUrl ? (
+                          <img
+                            src={finalLogoUrl}
+                            alt={`${club.name} Crest`}
+                            className="w-14 h-14 object-contain rounded border border-slate-100 p-1 bg-white"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const container = e.currentTarget.parentElement;
+                              if (container) {
+                                const fb = container.querySelector('.img-fallback-badge');
+                                if (fb) fb.classList.remove('hidden');
+                              }
+                            }}
+                          />
+                        ) : null}
+                        
+                        {/* Omni-fallback character badge text box if no graphic is parsed */}
+                        <div className={`img-fallback-badge w-14 h-14 bg-[#002366] text-white rounded flex items-center justify-center font-bold text-xl ${finalLogoUrl ? 'hidden' : ''}`}>
+                          {fallbackLetter}
+                        </div>
+
+                        <div>
+                          <h3 className="font-bold text-slate-900 text-base leading-tight">{club.name}</h3>
+                          <div className="flex items-center gap-1 text-slate-400 text-xs mt-1">
+                            <MapPin size={12} />
+                            <span>{club.location}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-6">{club.description || 'No description provided.'}</p>
+                    </div>
+
+                    {club.website && (
+                      <a
+                        href={club.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded transition-colors mt-auto"
+                      >
+                        <Globe size={12} />
+                        Visit Website
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Benefits Block Layout */}
       <section className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
           <div className="max-w-2xl mb-20">
