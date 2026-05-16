@@ -62,7 +62,7 @@ export default function HomePage() {
               The UK's Commercial Rugby Network
             </p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white uppercase leading-[1.05] mb-8 tracking-tight">
-              Where Rugby Meets<br />Commercial Opportunity
+              Where Rugby Meets <span className="whitespace-nowrap">Commercial Opportunity</span>
             </h1>
             <p className="text-lg text-white/50 leading-relaxed mb-12 max-w-xl">
               The UK's dedicated network connecting clubs with sponsors and service providers. One platform. One community.
@@ -165,14 +165,14 @@ export default function HomePage() {
                   <li key={item} className="flex items-start gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#002366] mt-2 shrink-0" />
                     <span className="text-slate-600 text-sm">{item}</span>
-                  </li>
+                  </div>
                 ))}
               </ul>
               <Link
-                to="/directory"
+                to="/businesses"
                 className="inline-flex items-center gap-2 text-[#002366] font-bold text-sm uppercase tracking-wider hover:underline"
               >
-                Browse the Directory
+                Browse Business Partners
                 <ArrowRight size={14} />
               </Link>
             </div>
