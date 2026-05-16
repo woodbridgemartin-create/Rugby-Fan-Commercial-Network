@@ -49,7 +49,7 @@ export default function BusinessNetworkPage() {
     <div className="bg-slate-50 min-h-screen p-6 antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* Header Block — FIXED COPY */}
+        {/* Header Block */}
         <div className="bg-[#002366] text-white p-8 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
           <div>
             <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Rugby Club Resources</span>
@@ -82,9 +82,14 @@ export default function BusinessNetworkPage() {
           >
             <option value="All Industries">All Industries</option>
             <option value="Construction & Engineering">Construction & Engineering</option>
-            <option value="Financial Services & Accounting">Financial Services</option>
-            <option value="Technology, Software & IT Support">Technology & Software</option>
+            <option value="Financial Services & Accounting">Financial Services & Accounting</option>
+            <option value="Technology, Software & IT Support">Technology, Software & IT Support</option>
             <option value="Hospitality, Catering & Event Management">Hospitality & Events</option>
+            <option value="Legal & Corporate Advisory">Legal & Corporate Advisory</option>
+            <option value="Marketing, Print & Creative Media">Marketing, Print & Creative Media</option>
+            <option value="Retail, Apparel & Merchandise">Retail, Apparel & Merchandise</option>
+            <option value="Logistics, Transport & Supply Chain">Logistics, Transport & Supply Chain</option>
+            <option value="Medical, Health & Physiotherapy">Medical, Health & Physiotherapy</option>
           </select>
         </div>
 
@@ -103,8 +108,14 @@ export default function BusinessNetworkPage() {
                 >
                   <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      {biz.logo_url ? (
-                        <img src={biz.logo_url} alt={biz.name} className="w-12 h-12 rounded-lg object-contain border border-slate-200 bg-white" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                      {biz.logo_url && biz.logo_url.trim() !== '' ? (
+                        <div className="w-12 h-12 rounded-lg border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
+                          <img 
+                            src={biz.logo_url} 
+                            alt={`${biz.name} logo`} 
+                            className="w-full h-full object-contain p-1"
+                          />
+                        </div>
                       ) : (
                         <div className="w-12 h-12 bg-slate-100 text-[#002366] border border-slate-200 rounded-lg flex items-center justify-center font-black text-lg shrink-0">
                           {biz.name.charAt(0).toUpperCase()}
