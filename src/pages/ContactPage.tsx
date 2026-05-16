@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
-import { Mail, MapPin, Send, HelpCircle, Trophy, Building, AlertCircle } from 'lucide-react';
+import { Mail, Send, HelpCircle, AlertCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    type: 'business', // 'club' or 'business'
     subject: '',
     message: ''
   });
@@ -35,7 +33,6 @@ export default function ContactPage() {
         body: JSON.stringify({
           Name: formData.name,
           Email: formData.email,
-          Account_Type: formData.type,
           Subject: formData.subject,
           Message: formData.message
         })
@@ -43,7 +40,7 @@ export default function ContactPage() {
 
       if (response.ok) {
         setStatus({ submitting: false, success: true, error: null });
-        setFormData({ name: '', email: '', type: 'business', subject: '', message: '' });
+        setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
         const data = await response.json();
         throw new Error(data.error || 'Failed to safely transmit data payload.');
@@ -67,13 +64,13 @@ export default function ContactPage() {
           <span className="text-amber-400 text-xs font-bold uppercase tracking-wider block mb-1">Get In Touch</span>
           <h1 className="text-3xl font-black uppercase tracking-tight">Contact the Network Team</h1>
           <p className="text-slate-300 text-xs mt-2 max-w-xl mx-auto md:mx-0">
-            Have questions about your directory profile, annual Founding Member subscriptions, or custom enterprise branding setups? Drop us a line below.
+            Have questions or feedback? Fill out the form below or email us directly, and our support team will get straight back to you.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* Column 1 & 2: Contact Form */}
+          {/* Main Layout: General Contact Form */}
           <div className="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
             {status.success ? (
               <div className="text-center py-12 space-y-3">
@@ -82,7 +79,7 @@ export default function ContactPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Message Transmitted</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Thank you for reaching out. Your entry has been wired to Formspree. A platform representative from the Rugby Fan team will review your inquiry shortly.
+                  Thank you for reaching out. Your entry has been securely wired to Formspree. A network team representative will review your message shortly.
                 </p>
                 <button 
                   onClick={() => setStatus({ submitting: false, success: false, error: null })}
@@ -94,45 +91,13 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 text-xs">
                 
-                {/* Error Banner state */}
+                {/* Error Banner State */}
                 {status.error && (
                   <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg flex items-center gap-2 font-medium">
                     <AlertCircle size={16} className="shrink-0" />
                     <span>{status.error}</span>
                   </div>
                 )}
-
-                {/* Form Segmentation Row */}
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">I am reaching out regarding a:</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className={`border rounded-xl p-3 flex items-center gap-2.5 cursor-pointer transition-all ${formData.type === 'club' ? 'border-[#002366] bg-slate-50 font-bold text-[#002366]' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
-                      <input 
-                        type="radio" 
-                        name="type" 
-                        value="club" 
-                        checked={formData.type === 'club'}
-                        onChange={(e) => setFormData({...formData, type: e.target.value})}
-                        className="sr-only" 
-                      />
-                      <Trophy size={16} className={formData.type === 'club' ? 'text-[#002366]' : 'text-slate-400'} />
-                      <span>Rugby Club Profile</span>
-                    </label>
-
-                    <label className={`border rounded-xl p-3 flex items-center gap-2.5 cursor-pointer transition-all ${formData.type === 'business' ? 'border-[#002366] bg-slate-50 font-bold text-[#002366]' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
-                      <input 
-                        type="radio" 
-                        name="type" 
-                        value="business" 
-                        checked={formData.type === 'business'}
-                        onChange={(e) => setFormData({...formData, type: e.target.value})}
-                        className="sr-only" 
-                      />
-                      <Building size={16} className={formData.type === 'business' ? 'text-[#002366]' : 'text-slate-400'} />
-                      <span>Business Membership</span>
-                    </label>
-                  </div>
-                </div>
 
                 {/* Name & Email Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,7 +120,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366]" 
-                      placeholder="name@company.co.uk"
+                      placeholder="name@domain.co.uk"
                     />
                   </div>
                 </div>
@@ -169,7 +134,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({...formData, subject: e.target.value})}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366]" 
-                    placeholder="How can we help your organisation?"
+                    placeholder="How can we help you?"
                   />
                 </div>
 
@@ -177,12 +142,12 @@ export default function ContactPage() {
                 <div className="space-y-1">
                   <label className="block font-bold text-slate-600 uppercase tracking-wider">Message Detail</label>
                   <textarea 
-                    rows={5}
+                    rows={6}
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-[#002366] resize-none" 
-                    placeholder="Please lay out your detailed query or requirements here..."
+                    placeholder="Please type out your detailed message here..."
                   />
                 </div>
 
@@ -192,23 +157,21 @@ export default function ContactPage() {
                   disabled={status.submitting}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#002366] hover:bg-[#001a4d] text-white font-bold uppercase tracking-wider text-[10px] rounded transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {status.submitting ? 'Transmitting...' : 'Submit Inquiry'} <Send size={12} />
+                  {status.submitting ? 'Transmitting...' : 'Submit Message'} <Send size={12} />
                 </button>
               </form>
             )}
           </div>
 
-          {/* Column 3: Contact Sidebar Details */}
+          {/* Sidebar: Direct Support Channels */}
           <div className="space-y-4">
-            
-            {/* Direct Channel Box */}
             <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-4 text-xs">
               <h3 className="font-bold text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-2">Direct Contact</h3>
               
               <div className="flex items-start gap-3">
                 <Mail size={16} className="text-[#002366] shrink-0 mt-0.5" />
                 <div>
-                  <span className="block font-bold text-slate-700">General & Sales Support</span>
+                  <span className="block font-bold text-slate-700">General Support</span>
                   <a href="mailto:hello@rugbyfan.co.uk" className="text-[#002366] font-semibold hover:underline">hello@rugbyfan.co.uk</a>
                 </div>
               </div>
@@ -221,20 +184,8 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
-
-            {/* Corporate Attribution Card */}
-            <div className="bg-slate-900 text-white p-5 rounded-2xl shadow-sm space-y-2 text-[11px] leading-relaxed">
-              <h3 className="font-bold text-amber-400 uppercase tracking-wide text-xs">Corporate Office</h3>
-              <p className="text-slate-300">
-                Rugby Fan is a commercial data platform owned, maintained, and operated completely by <strong>Leadsopedia Limited</strong>.
-              </p>
-              <div className="flex items-center gap-1.5 text-slate-400 mt-2">
-                <MapPin size={12} className="text-amber-400 shrink-0" />
-                <span>Registered Operator &bull; United Kingdom</span>
-              </div>
-            </div>
-
           </div>
+
         </div>
 
       </div>
