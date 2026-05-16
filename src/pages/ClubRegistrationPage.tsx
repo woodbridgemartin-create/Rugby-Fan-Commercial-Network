@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, Facebook, Image } from 'lucide-react';
+import { Shield, MapPin, Award, Globe, Mail, FileText, Target, ArrowRight, FacebookIcon, Image } from 'lucide-react';
 
 export default function ClubRegistrationPage() {
   const navigate = useNavigate();
@@ -194,7 +194,7 @@ export default function ClubRegistrationPage() {
               <div>
                 <label className="block text-xs font-bold uppercase text-slate-600 mb-1">Club Facebook Page URL</label>
                 <div className="relative">
-                  <Facebook className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <FacebookIcon className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
                     placeholder="facebook.com/yourclub"
@@ -225,15 +225,4 @@ export default function ClubRegistrationPage() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#002366] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#001a4d] transition-all disabled:bg-slate-300 shadow-sm"
-            >
-              {loading ? 'Publishing Profile...' : 'Publish Club Profile'}
-              <ArrowRight size={14} />
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  );
-}
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-
