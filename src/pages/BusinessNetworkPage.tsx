@@ -27,7 +27,13 @@ export default function BusinessNetworkPage() {
   useEffect(() => {
     async function getBusinesses() {
       try {
-        const { data, error } = await supabase.from('businesses').select('*').order('name', { ascending: true });
+        // Enforces verification loop parameters by returning strictly paying listings
+        const { data, error } = await supabase
+          .from('businesses')
+          .select('*')
+          .eq('approved', true)
+          .order('name', { ascending: true });
+          
         if (!error && data) setBusinesses(data);
       } catch (err) {
         console.error('Error loading businesses:', err);
