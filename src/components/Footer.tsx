@@ -49,9 +49,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-white/10 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-lg">RF</span>
-              </div>
+              {/* Isolated RF Icon Box Removed */}
               <span className="text-xl font-bold tracking-tight">Rugby Fan</span>
             </div>
             <p className="text-white/50 text-sm leading-relaxed mb-6">
