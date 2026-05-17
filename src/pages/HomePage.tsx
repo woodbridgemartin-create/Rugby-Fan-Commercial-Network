@@ -180,7 +180,7 @@ export default function HomePage() {
               <div className="text-center">
                 <Trophy size={36} className="text-[#002366] mx-auto mb-6" />
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  Connect with Clubs
+                  Support Grassroots Clubs
                 </h3>
                 <p className="text-slate-500 text-sm mb-8">
                   Find the perfect club to sponsor and make a lasting impact in the rugby community.
@@ -189,7 +189,7 @@ export default function HomePage() {
                   to="/business-registration"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#002366] text-white text-sm font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors"
                 >
-                  Find Sponsorship
+                  Become a Sponsor
                   <ArrowRight size={14} />
                 </Link>
               </div>
