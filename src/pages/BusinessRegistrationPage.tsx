@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Upload, HelpCircle, CreditCard } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -20,7 +20,7 @@ export default function BusinessRegistrationPage() {
   });
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [paymentRequired, setPaymentRequired] = useState(false); // Controls the final view swap
+  const [paymentRequired, setPaymentRequired] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -69,15 +69,13 @@ export default function BusinessRegistrationPage() {
       investment_range: formData.investment_range,
       looking_for: formData.looking_for,
       logo_url: formData.logo_url,
-      approved: false // CRITICAL: Sets entry to invisible until database flag or admin updates it post-payment
+      approved: false
     };
 
     try {
       const { error } = await supabase.from('businesses').insert([submissionPayload]);
       if (!error) {
-        // 1. Instantly deploy Stripe Link in a new focused screen tab
         window.open('https://buy.stripe.com/9B63cu23385v6Ko6sD6AM04', '_blank');
-        // 2. Render the embedded payment wall warning safely onto the current view
         setPaymentRequired(true);
       } else {
         throw error;
@@ -90,7 +88,6 @@ export default function BusinessRegistrationPage() {
     }
   };
 
-  // Intercept view layer layout if registration is saved but pending checkout conversion
   if (paymentRequired) {
     return (
       <div className="max-w-md mx-auto p-8 bg-white border border-slate-200 rounded-xl my-20 shadow-lg text-center text-xs antialiased">
