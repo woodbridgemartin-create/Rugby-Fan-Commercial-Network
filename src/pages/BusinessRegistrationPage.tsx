@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Upload, HelpCircle } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Upload, HelpCircle, CreditCard } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function BusinessRegistrationPage() {
@@ -20,6 +20,7 @@ export default function BusinessRegistrationPage() {
   });
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [paymentRequired, setPaymentRequired] = useState(false); // Controls the final view swap
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -52,7 +53,6 @@ export default function BusinessRegistrationPage() {
     
     const finalizedCategory = formData.category === 'Other' ? formData.custom_category : formData.category;
     
-    // Auto-format website link if they forgot to include protocol
     let formattedWebsite = formData.website.trim();
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
       formattedWebsite = `https://${formattedWebsite}`;
@@ -68,18 +68,66 @@ export default function BusinessRegistrationPage() {
       contact_name: formData.contact_name,
       investment_range: formData.investment_range,
       looking_for: formData.looking_for,
-      logo_url: formData.logo_url
+      logo_url: formData.logo_url,
+      approved: false // CRITICAL: Sets entry to invisible until database flag or admin updates it post-payment
     };
 
     try {
       const { error } = await supabase.from('businesses').insert([submissionPayload]);
-      if (!error) navigate('/directory');
+      if (!error) {
+        // 1. Instantly deploy Stripe Link in a new focused screen tab
+        window.open('https://buy.stripe.com/9B63cu23385v6Ko6sD6AM04', '_blank');
+        // 2. Render the embedded payment wall warning safely onto the current view
+        setPaymentRequired(true);
+      } else {
+        throw error;
+      }
     } catch (err) {
       console.error(err);
+      alert('Database registration failed. Please review your connection.');
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Intercept view layer layout if registration is saved but pending checkout conversion
+  if (paymentRequired) {
+    return (
+      <div className="max-w-md mx-auto p-8 bg-white border border-slate-200 rounded-xl my-20 shadow-lg text-center text-xs antialiased">
+        <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-100">
+          <CreditCard size={28} />
+        </div>
+        
+        <h1 className="text-xl font-bold text-slate-900 uppercase tracking-tight mb-3">Payment Required</h1>
+        
+        <p className="text-slate-500 leading-relaxed mb-6">
+          Your profile setup for <strong className="text-slate-800">{formData.name}</strong> has been saved securely, but will remain hidden from the directory loop until network dues are processed.
+        </p>
+
+        <div className="space-y-3">
+          <a 
+            href="https://buy.stripe.com/9B63cu23385v6Ko6sD6AM04"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full py-3 bg-[#002366] text-white font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors shadow-sm"
+          >
+            Launch Secure Payment Tab (£79)
+          </a>
+          
+          <button 
+            onClick={() => navigate('/clubs')}
+            className="block w-full py-3 bg-slate-100 text-slate-600 font-bold uppercase tracking-wider rounded hover:bg-slate-200 transition-colors"
+          >
+            Browse Public Listings
+          </button>
+        </div>
+
+        <p className="text-[10px] text-slate-400 mt-6 leading-normal">
+          Once your transaction confirmation clears our system backend parameters, your business listings transition live dynamically within 24 business hours.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white border border-slate-200 rounded-xl my-10 shadow-sm">
