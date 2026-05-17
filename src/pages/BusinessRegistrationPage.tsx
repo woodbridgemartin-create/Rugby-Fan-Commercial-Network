@@ -75,7 +75,8 @@ export default function BusinessRegistrationPage() {
     try {
       const { error } = await supabase.from('businesses').insert([submissionPayload]);
       if (!error) {
-        window.open('https://buy.stripe.com/9B63cu23385v6Ko6sD6AM04', '_blank');
+        // Launches your premium checkout stream link
+        window.open('https://buy.stripe.com/bJebJ04bbdpPecQ2cn6AM09', '_blank');
         setPaymentRequired(true);
       } else {
         throw error;
@@ -103,7 +104,7 @@ export default function BusinessRegistrationPage() {
 
         <div className="space-y-3">
           <a 
-            href="https://buy.stripe.com/9B63cu23385v6Ko6sD6AM04"
+            href="https://buy.stripe.com/bJebJ04bbdpPecQ2cn6AM09"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full py-3 bg-[#002366] text-white font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] transition-colors shadow-sm"
@@ -201,36 +202,4 @@ export default function BusinessRegistrationPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Contact Email *</label>
-            <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1 mb-1">
-              <label className="block font-bold text-slate-700 uppercase tracking-wide">Sponsorship Budget Limit</label>
-              <div className="group relative cursor-help">
-                <HelpCircle size={12} className="text-slate-400" />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-white text-[9px] p-2 rounded whitespace-nowrap z-50">
-                  Gives clubs clarity on what level of sponsorship assets you can support.
-                </div>
-              </div>
-            </div>
-            <input type="text" value={formData.investment_range} onChange={e => setFormData({...formData, investment_range: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="e.g. £500 - £2,500" />
-          </div>
-        </div>
-
-        <div>
-          <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Profile Overview</label>
-          <textarea rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full p-2 border border-slate-200 rounded" />
-        </div>
-        <div>
-          <label className="block font-bold text-slate-700 uppercase tracking-wide mb-1">Sponsorship Preferences / Targeted Assets</label>
-          <textarea rows={2} value={formData.looking_for} onChange={e => setFormData({...formData, looking_for: e.target.value})} className="w-full p-2 border border-slate-200 rounded placeholder:text-slate-300" placeholder="e.g. Looking for Front-of-Shirt placement or matchday hospitality access" />
-        </div>
-        
-        <button type="submit" disabled={submitting || uploading} className="w-full py-3 bg-[#002366] text-white font-bold uppercase tracking-wider rounded hover:bg-[#001a4d] disabled:opacity-50">
-          {submitting ? 'Saving Profile...' : 'Submit Partnership Registration'}
-        </button>
-      </form>
-    </div>
-  );
-}
+            <label className="block font-bold
